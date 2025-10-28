@@ -2,15 +2,17 @@ import torch
 from tqdm import tqdm
 import config as cfg
 import numpy as np
+import pandas as pd
 import torch.nn.functional as F
 from numpy.linalg import norm
 from scipy import stats
 from data_loaders import build_loaders_inference
-from models import BLEEPOnly, BLEEPWithOptimus, BLEEP_MLP, BLEEP_Optimus_MLP
+from models import BLEEPOnly, BLEEPWithOptimus, BLEEP_MLP, DeepPathway
 from spatialdata import read_zarr
 import scanpy as sc
 from visualization import plot_sdata
 import math
+import os
 def get_image_embeddings_with_optimus(test_loader,model_path, model):
     state_dict = torch.load(model_path)
     model.load_state_dict(state_dict)
@@ -186,7 +188,7 @@ def get_predicted_expressions(a,root_path,img_embeddings_all,spot_embeddings_all
     data = []
     datasize = []
     for each in a:
-        temp = np.load(root_path + "pathway expression/" + each + "_pathway_expression_matrix.npy").T
+        temp = np.array(pd.read_csv(root_path+"pathway expression/"+each+"_pathway expression.csv").iloc[:,1:]).T
         datasize.append(temp.shape[1])
         data.append(temp)
     for i in range(len(a)):
@@ -228,7 +230,7 @@ def metrics_calculation(true,pred):
     sp_corr_cells = sp_corr_cells[~np.isnan(sp_corr_cells)]
     cosine_cells = cosine_cells[~np.isnan(cosine_cells)]
 
-    print("Mean Pearson correlation across All spots (genewise correlation): ", np.mean(corr_cells))
+    print("Mean Pearson correlation across All spots (pathwaywuse correlation): ", np.mean(corr_cells))
     print("Mean Spearman correlation across spots: ", np.mean(sp_corr_cells))
     print("Mean Cosine Similarity across spots: ", np.mean(cosine_cells))
 
@@ -313,8 +315,7 @@ def main():
         else:
             method = cfg.method
         sdata.tables['predictions_'+method]=adata_preds
-        # sdata.write(cfg.root_path+"/SpatialData/" + cfg.test_sample + "_spatial_data.zarr",overwrite=True)
-        # np.save(cfg.root_path+"prediction_"+ cfg.method + "_" + cfg.dataset + "_pathways_" + cfg.test_sample+".npy", pred)
+        sdata.write(cfg.root_path+"/SpatialData/" + cfg.test_sample + "_spatial_data.zarr",overwrite=True)
         metrics_calculation(true,pred)
         top_k_pathways = get_top_k_pathways(true,pred,sdata['adata_pathways'].var_names.tolist(),k=3)
         plot_sdata(sdata, cfg.test_sample,top_k_pathway_names=top_k_pathways)
@@ -334,16 +335,16 @@ def main():
         else:
             method = cfg.method
         sdata.tables['predictions_' + method] = adata_preds
-        # sdata.write(cfg.root_path + "/SpatialData/" + cfg.test_sample + "_spatial_data.zarr", overwrite=True)
+        sdata.write(cfg.root_path + "/SpatialData/" + cfg.test_sample + "_spatial_data.zarr", overwrite=True)
         metrics_calculation(true,pred)
         top_k_pathways = get_top_k_pathways(true, pred, sdata['adata_pathways'].var_names.tolist(), k=3)
         plot_sdata(sdata, cfg.test_sample,top_k_pathway_names=top_k_pathways)
-    elif cfg.method == 'cnn+mlp+optimus':
+    elif cfg.method == 'DeepPathway':
         test_loader = get_loader_mlp([cfg.test_sample],cfg.root_path)
         model1_path = cfg.root_path+"saved_weights/itr_01_Bleep+optimus_"+cfg.dataset+"_pathways_"+cfg.test_sample+".pt"
         model2_path=cfg.root_path+"saved_weights/itr_01_"+cfg.method+"_"+cfg.dataset+"_pathways_"+cfg.test_sample+".pt"
         model1=BLEEPWithOptimus().to('cuda:0')
-        model2=BLEEP_Optimus_MLP().to('cuda:0')
+        model2=DeepPathway().to('cuda:0')
         emb1 = get_image_embeddings_with_optimus(test_loader,model1_path, model1)
         pred = get_image_embeddings_mlp(model2_path, model2, emb1).cpu().numpy()
         adata_preds = copy_adata(sdata['adata_pathways'], sc.AnnData(X=pred))
@@ -353,7 +354,7 @@ def main():
         else:
             method = cfg.method
         sdata.tables['predictions_' + method] = adata_preds
-        # sdata.write(cfg.root_path + "/SpatialData/" + cfg.test_sample + "_spatial_data.zarr", overwrite=True)
+        sdata.write(cfg.root_path + "/SpatialData/" + cfg.test_sample + "_spatial_data.zarr", overwrite=True)
         # np.save(cfg.root_path + "prediction_" + cfg.method + "_" + cfg.dataset + "_pathways_" + cfg.test_sample + ".npy",pred)
         metrics_calculation(true,pred)
         top_k_pathways = get_top_k_pathways(true, pred, sdata['adata_pathways'].var_names.tolist(), k=3)

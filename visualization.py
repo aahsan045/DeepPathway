@@ -3,7 +3,7 @@ from PIL import Image
 from spatialdata import read_zarr
 import spatialdata as sd
 from spatialdata.models import TableModel, Image2DModel
-import cv2
+import openslide
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -16,8 +16,10 @@ import config as cfg
 
 def plot_sdata(sdata,sample_id,top_k_pathway_names=['Hypoxia','DNA Repair','Myc Targets V1']):
     image_path = cfg.root_path + "wsis/" + sample_id + ".tif"
-    full_res_image=cv2.cvtColor(cv2.imread(image_path),cv2.COLOR_BGR2RGB)
-    image_for_sdata =Image2DModel.parse(data=full_res_image,dims=('y','x','c'))
+    slide=openslide.OpenSlide(image_path)
+    level_dims = slide.level_dimensions[0]
+    image = np.array(slide.read_region((0, 0), 0, level_dims).convert("RGB"))
+    image_for_sdata =Image2DModel.parse(data=image,dims=('y','x','c'))
     adata_true=sdata['adata_pathways']
     if "+" in cfg.method:
         method = cfg.method.replace("+","_")
@@ -26,18 +28,6 @@ def plot_sdata(sdata,sample_id,top_k_pathway_names=['Hypoxia','DNA Repair','Myc 
     adata_preds=sdata['predictions_'+method]
     radius = adata_true.uns['spatial']['ST']['scalefactors']['spot_diameter_fullres']/2
     centers = adata_true.obsm["spatial"]
-    # centers_new = np.array([[y,x] for x,y in adata_true.obsm["spatial"]])
-    # spot_df = pd.concat([adata_true.obs[["array_col", "array_row"]].reset_index(drop=True),
-    #                      pd.DataFrame(centers_new, columns=["x", "y"])],axis=1,ignore_index=True,
-    #                    )
-    # spot_df.columns = ["array_col", "array_row", "spot_center_x", "spot_center_y"]
-    # fixed_row = spot_df.array_row.iloc[0].item()
-    # cols = spot_df.query(f"array_row == {fixed_row}").array_col
-    # min_col, max_col = cols.min().item(), cols.max().item()
-    # xs = spot_df.query(f"array_row == {fixed_row}").spot_center_x
-    # min_x, max_x = xs.min().item(), xs.max().item()
-    # px_per_um = (max_x - min_x) / ((max_col - min_col) / 2) / 100
-    # radius = px_per_um * 55 / 2
     df = pd.DataFrame([radius] * len(centers), columns=["radius"])
     gdf = gpd.GeoDataFrame(df, geometry=[Point(x, y) for x, y in centers])
     shapes_for_sdata = ShapesModel.parse(gdf)

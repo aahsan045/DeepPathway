@@ -96,7 +96,7 @@ class BLEEPWithOptimus(nn.Module):
         return loss
 
 
-class BLEEP_Optimus_MLP(nn.Module):
+class DeepPathway(nn.Module):
     def __init__(self):
         super().__init__()
         self.device = torch.device(cfg.device)

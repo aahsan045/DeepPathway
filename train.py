@@ -27,7 +27,7 @@ torch.backends.cudnn.benchmark = False
 os.environ['PYTHONHASHSEED'] = str(cfg.seed)
 
 from data_loaders import build_loaders
-from models import BLEEPOnly, BLEEPWithOptimus, BLEEP_MLP, BLEEP_Optimus_MLP
+from models import BLEEPOnly, BLEEPWithOptimus, BLEEP_MLP, DeepPathway
 from utils import *
 
 def train_epoch(model, train_loader, optimizer, lr_scheduler=None):
@@ -70,8 +70,8 @@ def main():
         model=BLEEPWithOptimus().to(cfg.device)
         print("Model is BLEEP with Optimus using Image Encoder of ResNet18")
     elif cfg.method=='cnn+mlp+optimus':
-        model=BLEEP_Optimus_MLP(cfg.root_path,cfg.test_sample,cfg.dataset).to(cfg.device)
-        print("Model is BLEEP+Optimus with MLP using Image Encoder of ResNet18")
+        model=DeepPathway(cfg.root_path,cfg.test_sample,cfg.dataset).to(cfg.device)
+        print("Model is DeepPathway (BLEEP+Optimus with MLP) using Image Encoder of ResNet18")
     elif cfg.method=='cnn+mlp':
         model=BLEEP_MLP(cfg.root_path,cfg.test_sample,cfg.dataset).to(cfg.device)
         print("Model is BLEEP with MLP using Image Encoder of ResNet18")

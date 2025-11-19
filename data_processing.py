@@ -39,7 +39,7 @@ def get_adata(paths,uni_pathway_genes):
     print("No. of unique genes after filtering",len(unique_genes))
     unique_common_genes = list(set(unique_genes).intersection(set(uni_pathway_genes)))
     print("No. of Common genes between unique pathway genes and unique filtered genes from all samples",len(unique_common_genes))
-    return unique_common_genes
+    return unique_genes
 def save_adatas(paths,unique_common_genes):
     filtered_exp_mtxs = []
     barcodes_updated=[]
@@ -262,7 +262,8 @@ def calculate_Rmax_threshold(root_path,samples):
         temp=np.load(root_path+"filtered_gene_expression/"+sample+"_sample_unique_genes_pathways_samples.npy")
         sorted_arr = np.sort(temp, axis=1)[:, ::-1]
         zero_indices = np.argmax(sorted_arr == 0, axis=1)
-        res.append(np.median(zero_indices))
+        for each in zero_indices:
+            res.append(each)
     print("Rmax Threshold for this data with median is: ",np.median(res))  # Array of indices where the first 0 appears in each row
     return np.median(res)
 def main():

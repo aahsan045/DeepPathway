@@ -1,5 +1,6 @@
 # DeepPathway: Predicting Pathway Expression from Histopathology Images
-# URL: https://www.biorxiv.org/content/10.1101/2025.07.21.665956v1.abstract
+# URL: 
+      https://www.biorxiv.org/content/10.1101/2025.07.21.665956v1.abstract
 This repository contains implementation code for DeepPathway.
 # Overview:
 - DeepPathway is a bimodal contrastive learning framework that is trained on Spatial Transcriptomics (ST) datasets to predict pathway expression from H&E images.

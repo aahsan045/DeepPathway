@@ -33,7 +33,7 @@ This repository contains implementation code for DeepPathway.
 4. Open and modify config.py and put your SAMPLE_IDs in "all_samples" list.
 5. Provide your Pathway Definition file. We obtained MsigDB hallmark pathway definitions from here: https://maayanlab.cloud/Enrichr/#libraries.
 6. Add MPP resolution of each WSI in config.py or extract from metadata (from HEST-1k in our case.) 
-7. Restart Kernel after saving the config.py and run "train.py" file. Run "python data_processing.py" OR see Tutorials/data_processing.ipynb for data processing
+7. Restart Kernel after saving the config.py file. Run "python data_processing.py" OR see Tutorials/data_processing.ipynb for data processing
 8. "IMPORTANT": Run Ucell Calculations before creating SpatialData objects (which will be used in model training and Validation.). Use Ucell_code.R file with your configurations to store Spot X pathway matrix of each sample. Use R_max threshold as obtained for pathway expression quantification (which will be calculated during running data processing module.) 
 
 # Training and Validation

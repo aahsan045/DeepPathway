@@ -51,20 +51,20 @@ mlp_dropout=0.2
 train_batchsize=256
 val_batchsize=64
 top_k=10  #Number of reference (Neighbour) points used to estimate pathway or gene expression using BLEEP. Default: 10 for pathways, 50 for genes 
-method="Bleep+optimus"  # Bleep OR Bleep+optimus OR cnn+mlp or DeepPathway
+method="DeepPathway"  # Bleep OR Bleep+optimus OR cnn+mlp or DeepPathway
 # set the disease dataset variables with the training and testing sample ids
 dataset="prostate"
 # all_samples=["MEND154","MEND156","MEND157","MEND158","MEND159","MEND160","MEND161","MEND162"]  # all sample IDs in the dataset. User can choose their own dataset IDs.
-all_samples=["MEND61","MEND62"]
-test_sample="MEND61"   # One test sample Id for test
+all_samples=['MEND154',"MEND156","MEND157","MEND158","MEND159","MEND160","MEND161","MEND162"]
+test_sample="MEND154"   # One test sample Id for test
 train_samples=sorted(list(set(all_samples)-set([test_sample])))
 root_path="/home/e90244aa/Bleep/DeepPathwayV2/prostate cancer dataset/"
-hest_metadata=pd.read_csv("HEST_v1_1_0 .csv") #download metadata CSV file from https://huggingface.co/datasets/MahmoodLab/hest/tree/main
+hest_metadata=pd.read_csv("/home/e90244aa/Bleep/DeepPathway/HEST_v1_1_0 .csv") #download metadata CSV file from https://huggingface.co/datasets/MahmoodLab/hest/tree/main
 mpp_res = [hest_metadata[hest_metadata['id']==each]['pixel_size_um_estimated'].values.astype(float)[0] for each in all_samples]
 # mpp_res=[0.3415]*len(all_samples)
 
 # second_path="bleep_pathway_expression/"
 
-pathway_dict_file = "pathway_dict_msigdb_hallmark_complete.json"
+pathway_dict_file = "/home/e90244aa/Bleep/DeepPathway/pathway_dict_msigdb_hallmark_complete.json"
 threshold_pathways=0.70
 

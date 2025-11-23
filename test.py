@@ -47,16 +47,17 @@ def get_image_embeddings_without_optimus(test_loader,model_path, model):
     return torch.cat(test_image_embeddings)
 
 
-def get_image_embeddings_mlp(model_path, model, image_embeddings):
+def get_predictions_BLEEP_MLP(model_path, model, test_loader): #get_image_embeddings_mlp
     state_dict = torch.load(model_path)
     model.load_state_dict(state_dict)
     model.eval()
     print("Finished loading model")
-
     test_image_embeddings = []
     with torch.no_grad():
-        for each in image_embeddings:
-            preds = model.img_linear(torch.tensor(each).float().unsqueeze(0).cuda())
+        for batch in tqdm(test_loader):
+            image_features = model.image_model.image_encoder(batch["image"].cuda())
+            image_embeddings=model.image_model.image_projection(image_features)
+            preds=model.img_linear(image_embeddings)
             test_image_embeddings.append(preds)
     return torch.cat(test_image_embeddings)
 
@@ -78,15 +79,32 @@ def get_embeddings_bleep_optimus(model_path, model,test_loader):
     test_spot_embeddings = []
     with torch.no_grad():
         for batch in tqdm(test_loader):
-            image_features = model.image_encoder(batch["image"].cuda())
-            enc = batch['pos encodings'].cuda()
+            image_features = model.image_model.image_encoder(batch["image"].cuda())
             optim_feat = batch['st_feat'].cuda()
             image_features = torch.cat((image_features, optim_feat), dim=1)
-            image_embeddings = model.image_projection(image_features)
+            image_embeddings = model.image_model.image_projection(image_features)
             test_image_embeddings.append(image_embeddings)
             test_spot_embeddings.append(model.spot_projection(batch["reduced_expression"].cuda()))
 
     return torch.cat(test_image_embeddings), torch.cat(test_spot_embeddings)
+
+def get_prediction_DeepPathway(model_path, model,test_loader):
+    state_dict = torch.load(model_path)
+    model.load_state_dict(state_dict)
+    model.eval()
+
+    print("Finished loading model")
+
+    preds = []
+    with torch.no_grad():
+        for batch in tqdm(test_loader):
+            image_features = model.image_model.image_encoder(batch["image"].cuda())
+            optim_feat = batch['st_feat'].cuda()
+            image_features = torch.cat((image_features, optim_feat), dim=1)
+            image_embeddings = model.img_linear(model.image_model.image_projection(image_features))
+            preds.append(image_embeddings)
+
+    return torch.cat(preds)
 
 def get_embeddings_bleep(model_path, model,test_loader):  # for simple Bleep model
     state_dict = torch.load(model_path)
@@ -123,7 +141,7 @@ def get_loader_mlp(test_sample,root_path):
     test_loader = build_loaders_inference(test_sample, root_path)
     return test_loader
 
-def get_predictions_from_bleep(image_query,expression_gt,spot_key,expression_key,method='average'):
+def get_predictions_from_bleep(image_query,expression_gt,spot_key,expression_key,method='average',k=10):
     if image_query.shape[1] != 256:
         image_query = image_query.T
         print("image query shape: ", image_query.shape)
@@ -138,7 +156,7 @@ def get_predictions_from_bleep(image_query,expression_gt,spot_key,expression_key
         print("expression_key shape: ", expression_key.shape)
 
     if method == "simple":
-        indices = find_matches(spot_key, image_query, top_k=1)
+        indices = find_matches(spot_key, image_query, top_k=k)
         matched_spot_embeddings_pred = spot_key[indices[:, 0], :]
         print("matched spot embeddings pred shape: ", matched_spot_embeddings_pred.shape)
         matched_spot_expression_pred = expression_key[indices[:, 0], :]
@@ -146,7 +164,7 @@ def get_predictions_from_bleep(image_query,expression_gt,spot_key,expression_key
 
     if method == "average":
         print("finding matches, using average of top 10 expressions")
-        indices = find_matches(spot_key, image_query, top_k=10)
+        indices = find_matches(spot_key, image_query, top_k=k)
         matched_spot_embeddings_pred = np.zeros((indices.shape[0], spot_key.shape[1]))
         matched_spot_expression_pred = np.zeros((indices.shape[0], expression_key.shape[1]))
         for i in range(indices.shape[0]):
@@ -159,7 +177,7 @@ def get_predictions_from_bleep(image_query,expression_gt,spot_key,expression_key
 
     if method == "weighted_average":
         print("finding matches, using weighted average of top 50 expressions")
-        indices = find_matches(spot_key, image_query, top_k=10)
+        indices = find_matches(spot_key, image_query, top_k=k)
         matched_spot_embeddings_pred = np.zeros((indices.shape[0], spot_key.shape[1]))
         matched_spot_expression_pred = np.zeros((indices.shape[0], expression_key.shape[1]))
         for i in range(indices.shape[0]):
@@ -184,7 +202,7 @@ def get_predictions_from_bleep(image_query,expression_gt,spot_key,expression_key
     # print(np.min(true))
     return pred
 
-def get_predicted_expressions(a,root_path,img_embeddings_all,spot_embeddings_all):
+def get_predicted_expressions(a,root_path,img_embeddings_all,spot_embeddings_all,k=10):
     data = []
     datasize = []
     for each in a:
@@ -202,7 +220,7 @@ def get_predicted_expressions(a,root_path,img_embeddings_all,spot_embeddings_all
     spot_key=np.concatenate([np.load(root_path+"spot_embeddings_"+str(i+1)+".npy") for i in range(1,len(data))],axis=1)
     image_query = np.load(root_path + "img_embeddings_1.npy")
     expression_gt = data[0].T
-    expression_pred = get_predictions_from_bleep(image_query,expression_gt,spot_key,expression_key,method='average')
+    expression_pred = get_predictions_from_bleep(image_query,expression_gt,spot_key,expression_key,method='average',k=10)
     return expression_pred
 
 def find_matches(spot_embeddings, query_embeddings, top_k=1):
@@ -307,7 +325,7 @@ def main():
         image_embeddings_all, spot_embeddings_all = get_embeddings_bleep(model_path, model, test_loader)
         image_embeddings_all= image_embeddings_all.cpu().numpy()
         spot_embeddings_all  = spot_embeddings_all.cpu().numpy()
-        pred = get_predicted_expressions(names, cfg.root_path, image_embeddings_all, spot_embeddings_all)
+        pred = get_predicted_expressions(names, cfg.root_path, image_embeddings_all, spot_embeddings_all,cfg.top_k)
         adata_preds =copy_adata(sdata['adata_pathways'],sc.AnnData(X=pred))
         method=str()
         if "+" in cfg.method:
@@ -327,7 +345,7 @@ def main():
         image_embeddings_all, spot_embeddings_all = get_embeddings_bleep_optimus(model_path, model,test_loader)
         image_embeddings_all = image_embeddings_all.cpu().numpy()
         spot_embeddings_all = spot_embeddings_all.cpu().numpy()
-        pred = get_predicted_expressions(names, cfg.root_path, image_embeddings_all,spot_embeddings_all)
+        pred = get_predicted_expressions(names, cfg.root_path, image_embeddings_all,spot_embeddings_all,cfg.top_k)
         adata_preds = copy_adata(sdata['adata_pathways'], sc.AnnData(X=pred))
         method=str()
         if "+" in cfg.method:
@@ -340,13 +358,10 @@ def main():
         top_k_pathways = get_top_k_pathways(true, pred, sdata['adata_pathways'].var_names.tolist(), k=3)
         plot_sdata(sdata, cfg.test_sample,top_k_pathway_names=top_k_pathways)
     elif cfg.method == 'DeepPathway':
-        test_loader = get_loader_mlp([cfg.test_sample],cfg.root_path)
-        model1_path = cfg.root_path+"saved_weights/itr_01_Bleep+optimus_"+cfg.dataset+"_pathways_"+cfg.test_sample+".pt"
-        model2_path=cfg.root_path+"saved_weights/itr_01_"+cfg.method+"_"+cfg.dataset+"_pathways_"+cfg.test_sample+".pt"
-        model1=BLEEPWithOptimus().to('cuda:0')
-        model2=DeepPathway().to('cuda:0')
-        emb1 = get_image_embeddings_with_optimus(test_loader,model1_path, model1)
-        pred = get_image_embeddings_mlp(model2_path, model2, emb1).cpu().numpy()
+        test_loader = build_loaders_inference([cfg.test_sample], cfg.root_path)
+        model_path=cfg.root_path+"saved_weights/itr_01_"+cfg.method+"_"+cfg.dataset+"_pathways_"+cfg.test_sample+".pt"
+        model=DeepPathway().to('cuda:0')
+        pred = get_prediction_DeepPathway(model_path, model,test_loader).cpu().numpy()
         adata_preds = copy_adata(sdata['adata_pathways'], sc.AnnData(X=pred))
         method = str()
         if "+" in cfg.method:
@@ -360,14 +375,11 @@ def main():
         top_k_pathways = get_top_k_pathways(true, pred, sdata['adata_pathways'].var_names.tolist(), k=3)
         plot_sdata(sdata, cfg.test_sample, top_k_pathway_names=top_k_pathways)
 
-    else:
-        test_loader = get_loader_mlp([cfg.test_sample], cfg.root_path)
-        model1_path = cfg.root_path +"saved_weights/"+ "itr_01_Bleep_" + cfg.dataset + "_pathways_" + cfg.test_sample + ".pt"
-        model2_path = cfg.root_path + "saved_weights/" + "itr_01_" + cfg.method + "_" + cfg.dataset + "_pathways_" + cfg.test_sample + ".pt"
-        model1=BLEEPOnly().to('cuda:0')
-        model2 = BLEEP_MLP().to('cuda:0')
-        emb1 = get_image_embeddings_without_optimus(test_loader,model1_path, model1)
-        pred = get_image_embeddings_mlp(model2_path, model2, emb1).cpu().numpy()
+    else: # case for BLEEP with MLP (DNN)
+        test_loader = test_loader = build_loaders_inference([cfg.test_sample], cfg.root_path)
+        model_path = cfg.root_path + "saved_weights/" + "itr_01_" + cfg.method + "_" + cfg.dataset + "_pathways_" + cfg.test_sample + ".pt"
+        model = BLEEP_MLP().to('cuda:0')
+        pred = get_predictions_BLEEP_MLP(model_path, model, test_loader).cpu().numpy()
         adata_preds = copy_adata(sdata['adata_pathways'], sc.AnnData(X=pred))
         method = str()
         if "+" in cfg.method:

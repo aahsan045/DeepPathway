@@ -50,6 +50,7 @@ dropout = 0.35
 mlp_dropout=0.2
 train_batchsize=256
 val_batchsize=64
+top_k=10  #Number of reference (Neighbour) points used to estimate pathway or gene expression using BLEEP. Default: 10 for pathways, 50 for genes 
 method="Bleep+optimus"  # Bleep OR Bleep+optimus OR cnn+mlp or DeepPathway
 # set the disease dataset variables with the training and testing sample ids
 dataset="prostate"

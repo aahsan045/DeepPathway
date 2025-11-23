@@ -315,6 +315,9 @@ def main():
     print("Starting H-Optimus-0 Feature Extraction Process.....")
     get_optimus_features(device, root_path, samples)
     print("Saving processed data as SpatialData Objects. Please perform this step once you have calculated Ucell scores.")
+    all_exist = all(os.path.exists(root_path+"pathway expression/"+each+"_pathway expression.csv") for each in all_samples)
+    if not all_exist:
+        raise FileNotFoundError("One or more pathway expression files are missing!")
     Sdata_creation(root_path,samples,filtered_pathway_dic,dataset=cfg.dataset)
     return
 if __name__ == "__main__":

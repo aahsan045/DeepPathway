@@ -111,12 +111,11 @@ class DeepPathway(nn.Module):
 
     def forward(self, batch):
         images = batch["image"]
-        enc = batch['pos encodings']
         true = batch["reduced_expression"]
         optim_feat = batch['st_feat']
         image_features = self.image_model.image_encoder(images)
         image_features = torch.cat((image_features, optim_feat), dim=1)
-        image_features = self.image_model.image_projection(image_features)  # + enc.float()
+        image_features = self.image_model.image_projection(image_features)
         l1_regularization_image = 0.0001 * torch.norm(image_features, p=1)
         preds = self.img_linear(image_features.float())
         mae_loss = torch.mean(torch.abs(preds - true))
@@ -137,7 +136,6 @@ class BLEEP_MLP(nn.Module):
 
     def forward(self, batch):
         images = batch["image"]
-        enc = batch['pos encodings']
         true = batch["reduced_expression"]
         image_features = self.image_model.image_encoder(images)
         image_features = self.image_model.image_projection(image_features)  # + enc.float()

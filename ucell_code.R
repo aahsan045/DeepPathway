@@ -2,12 +2,26 @@ library(Matrix)
 library(R.matlab)
 library(UCell)
 library(jsonlite)
-json_data <- fromJSON("/home/e90244aa/Bleep/DeepPathwayV2/prostate cancer dataset/pathway_dict_20.json")
+json_data <- fromJSON("/home/e90244aa/Bleep/visium HD processed/pathway_dict_msigdb_hallmark_filtered50.json")
 signatures_list <- lapply(json_data, as.character)
 signatures_list <- as.list(signatures_list)
-names <- c("MEND61","MEND62")
+names <- c("1",
+           "2",
+           "3",
+           "4",
+           "5",
+           "6",
+           "7",
+           "8",
+           "9",
+           "10",
+           "11",
+           "12",
+           "13",
+           "14",
+           "15")
 for (name in names){
-  link <- paste0("/home/e90244aa/Bleep/DeepPathwayV2/prostate cancer dataset/data for Ucell calculations/",name,"_data.mat")
+  link <- paste0("/home/e90244aa/Bleep/visium HD processed/data_",name,"_part_56.mat")
   sample <- readMat(link)
   data <- sample$x
   cell_names <- unlist(sample$cell.names)
@@ -17,7 +31,7 @@ for (name in names){
   colnames(DgCMatrix_obj) <- cell_names
   gene_names <- as.vector(trimws(unlist(sample$gene.names)))
   rownames(DgCMatrix_obj) <- gene_names
-  scores <- ScoreSignatures_UCell(DgCMatrix_obj, features=signatures_list,maxRank=1543)
-  link <- paste0("/home/e90244aa/Bleep/DeepPathwayV2/prostate cancer dataset/pathway expression/",name,"_pathway expression.csv")
+  scores <- ScoreSignatures_UCell(DgCMatrix_obj, features=signatures_list,maxRank=645)
+  link <- paste0("/home/e90244aa/Bleep/visium HD processed/",name,"_pathway expression.csv")
   write.csv(scores, file = link, row.names = TRUE)
 }

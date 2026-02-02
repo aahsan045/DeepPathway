@@ -1,0 +1,865 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>This tutorial provides the data processing of the ST datasets. Plase update and save the config.py file as following. &mdash; DeepPathway 0.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../_static/nbsphinx-code-cells.css?v=2aa19091" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=2709fde1"></script>
+      <script src="../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+      <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+      <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            DeepPathway
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../Usage.html">Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="index.html">Tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../API_Reference.html">API_Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../README.html">README</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">DeepPathway</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">This tutorial provides the data processing of the ST datasets. Plase update and save the config.py file as following.</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/tutorials/data_processing.ipynb.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="This-tutorial-provides-the-data-processing-of-the-ST-datasets.-Plase-update-and-save-the-config.py-file-as-following.">
+<h1>This tutorial provides the data processing of the ST datasets. Plase update and save the config.py file as following.<a class="headerlink" href="#This-tutorial-provides-the-data-processing-of-the-ST-datasets.-Plase-update-and-save-the-config.py-file-as-following." title="Link to this heading"></a></h1>
+<ol class="arabic simple">
+<li><p>Put data samples names (Training/Testing samples) along with their directories and sample names.</p></li>
+<li><p>Other parameters are as per DeepPathway’s implementation. You can change it for your experiments.</p></li>
+<li><p>Input data files, e.g., pathway database in form of json file or ST metadata csv file should be placed in Root_DIR</p></li>
+</ol>
+<section id="Loading-Libraries">
+<h2>Loading Libraries<a class="headerlink" href="#Loading-Libraries" title="Link to this heading"></a></h2>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">scanpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">sc</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">cv2</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">scipy</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">openslide</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">PIL</span><span class="w"> </span><span class="kn">import</span> <span class="n">Image</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">tiatoolbox</span><span class="w"> </span><span class="kn">import</span> <span class="n">data</span><span class="p">,</span> <span class="n">logger</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">tiatoolbox.wsicore.wsireader</span><span class="w"> </span><span class="kn">import</span> <span class="n">VirtualWSIReader</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">tiatoolbox.tools</span><span class="w"> </span><span class="kn">import</span> <span class="n">patchextraction</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">huggingface_hub</span><span class="w"> </span><span class="kn">import</span> <span class="n">login</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">spatialdata</span><span class="w"> </span><span class="kn">import</span> <span class="n">SpatialData</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">spatialdata.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">TableModel</span><span class="p">,</span> <span class="n">Image2DModel</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">timm</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">torchvision</span><span class="w"> </span><span class="kn">import</span> <span class="n">transforms</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">config</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">cfg</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+|2025-11-18|18:02:29.820| [WARNING] It looks like you are using Pixman version 0.38 (via conda). This version is known to cause issues with OpenSlide. Please consider upgrading to Pixman version 0.39 or later. You may be able do this with the command: conda install -c conda-forge pixman&#34;&gt;=0.39&#34;
+|2025-11-18|18:02:32.273| [WARNING] /home/e90244aa/anaconda3/envs/bleep_env/lib/python3.10/site-packages/pydantic/_internal/_generate_schema.py:2249: UnsupportedFieldAttributeWarning: The &#39;repr&#39; attribute with value False was provided to the `Field()` function, which has no effect in the context it was used. &#39;repr&#39; is field-specific metadata, and can only be attached to a model field using `Annotated` metadata or by assignment. This may have happened because an `Annotated` type alias using the `type` statement was used, or if the `Field()` function was attached to a single member of a union type.
+  warnings.warn(
+
+|2025-11-18|18:02:32.273| [WARNING] /home/e90244aa/anaconda3/envs/bleep_env/lib/python3.10/site-packages/pydantic/_internal/_generate_schema.py:2249: UnsupportedFieldAttributeWarning: The &#39;frozen&#39; attribute with value True was provided to the `Field()` function, which has no effect in the context it was used. &#39;frozen&#39; is field-specific metadata, and can only be attached to a model field using `Annotated` metadata or by assignment. This may have happened because an `Annotated` type alias using the `type` statement was used, or if the `Field()` function was attached to a single member of a union type.
+  warnings.warn(
+
+|2025-11-18|18:02:33.219| [WARNING] /home/e90244aa/anaconda3/envs/bleep_env/lib/python3.10/site-packages/xarray_schema/__init__.py:1: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools&lt;81.
+  from pkg_resources import DistributionNotFound, get_distribution
+
+</pre></div></div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">get_adata</span><span class="p">(</span><span class="n">paths</span><span class="p">,</span><span class="n">uni_pathway_genes</span><span class="p">):</span>
+    <span class="n">hvg_bools</span><span class="o">=</span><span class="p">[]</span>
+    <span class="k">for</span> <span class="n">path</span> <span class="ow">in</span> <span class="n">paths</span><span class="p">:</span>
+        <span class="n">adata</span> <span class="o">=</span> <span class="n">sc</span><span class="o">.</span><span class="n">read_h5ad</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+<span class="c1">#         adata = adata[adata.obs[&#39;in_tissue&#39;]==1]</span>
+        <span class="n">sc</span><span class="o">.</span><span class="n">pp</span><span class="o">.</span><span class="n">filter_cells</span><span class="p">(</span><span class="n">adata</span><span class="p">,</span> <span class="n">min_genes</span><span class="o">=</span><span class="mi">500</span><span class="p">)</span>
+        <span class="n">sc</span><span class="o">.</span><span class="n">pp</span><span class="o">.</span><span class="n">filter_genes</span><span class="p">(</span><span class="n">adata</span><span class="p">,</span><span class="n">min_cells</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+        <span class="n">sc</span><span class="o">.</span><span class="n">pp</span><span class="o">.</span><span class="n">normalize_total</span><span class="p">(</span><span class="n">adata</span><span class="p">)</span>
+        <span class="n">sc</span><span class="o">.</span><span class="n">pp</span><span class="o">.</span><span class="n">log1p</span><span class="p">(</span><span class="n">adata</span><span class="p">)</span>
+        <span class="n">sc</span><span class="o">.</span><span class="n">pp</span><span class="o">.</span><span class="n">highly_variable_genes</span><span class="p">(</span><span class="n">adata</span><span class="p">,</span> <span class="n">n_top_genes</span><span class="o">=</span><span class="mi">10000</span><span class="p">)</span> <span class="c1">#for pathways n_top_genes = 10,000</span>
+        <span class="n">hvg</span> <span class="o">=</span> <span class="n">adata</span><span class="o">.</span><span class="n">var</span><span class="p">[</span><span class="s1">&#39;highly_variable&#39;</span><span class="p">]</span>
+        <span class="n">hvg_bools</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">hvg</span><span class="p">)</span>
+    <span class="n">hvg_union</span> <span class="o">=</span> <span class="n">hvg_bools</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">paths</span><span class="p">)):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="nb">sum</span><span class="p">(</span><span class="n">hvg_union</span><span class="p">),</span> <span class="nb">sum</span><span class="p">(</span><span class="n">hvg_bools</span><span class="p">[</span><span class="n">i</span><span class="p">]))</span>
+        <span class="n">hvg_union</span> <span class="o">=</span> <span class="n">hvg_union</span> <span class="o">|</span> <span class="n">hvg_bools</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+    <span class="n">unique_genes</span><span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">hvg_union</span><span class="p">[</span><span class="n">hvg_union</span><span class="o">==</span><span class="kc">True</span><span class="p">]</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">values</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;No. of unique genes after filtering&quot;</span><span class="p">,</span><span class="nb">len</span><span class="p">(</span><span class="n">unique_genes</span><span class="p">))</span>
+    <span class="n">unique_common_genes</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">unique_genes</span><span class="p">)</span><span class="o">.</span><span class="n">intersection</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">uni_pathway_genes</span><span class="p">)))</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;No. of Common genes between unique pathway genes and unique filtered genes from all samples&quot;</span><span class="p">,</span><span class="nb">len</span><span class="p">(</span><span class="n">unique_common_genes</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">unique_genes</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">save_adatas</span><span class="p">(</span><span class="n">paths</span><span class="p">,</span><span class="n">unique_common_genes</span><span class="p">):</span>
+    <span class="n">filtered_exp_mtxs</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">barcodes_updated</span><span class="o">=</span><span class="p">[]</span>
+    <span class="k">for</span> <span class="n">path</span> <span class="ow">in</span> <span class="n">paths</span><span class="p">:</span>
+        <span class="n">adata</span> <span class="o">=</span> <span class="n">sc</span><span class="o">.</span><span class="n">read_h5ad</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+        <span class="n">adata</span> <span class="o">=</span> <span class="n">adata</span><span class="p">[</span><span class="n">adata</span><span class="o">.</span><span class="n">obs</span><span class="p">[</span><span class="s1">&#39;in_tissue&#39;</span><span class="p">]</span><span class="o">==</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">sc</span><span class="o">.</span><span class="n">pp</span><span class="o">.</span><span class="n">filter_cells</span><span class="p">(</span><span class="n">adata</span><span class="p">,</span> <span class="n">min_genes</span><span class="o">=</span><span class="mi">500</span><span class="p">)</span>
+        <span class="n">sc</span><span class="o">.</span><span class="n">pp</span><span class="o">.</span><span class="n">normalize_total</span><span class="p">(</span><span class="n">adata</span><span class="p">)</span>
+        <span class="n">sc</span><span class="o">.</span><span class="n">pp</span><span class="o">.</span><span class="n">log1p</span><span class="p">(</span><span class="n">adata</span><span class="p">)</span>
+        <span class="n">indices</span> <span class="o">=</span> <span class="p">[</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">gene</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">adata</span><span class="o">.</span><span class="n">var_names</span><span class="o">.</span><span class="n">values</span><span class="p">)</span> <span class="k">if</span> <span class="n">gene</span> <span class="ow">in</span> <span class="n">unique_common_genes</span><span class="p">]</span>
+        <span class="n">filtered_exp_mtxs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">adata</span><span class="p">[:,</span><span class="n">indices</span><span class="p">]</span><span class="o">.</span><span class="n">X</span><span class="p">)</span>
+        <span class="n">barcodes_updated</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">adata</span><span class="o">.</span><span class="n">obs_names</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">adata</span><span class="p">[:,</span> <span class="n">indices</span><span class="p">]</span><span class="o">.</span><span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">filtered_exp_mtxs</span><span class="p">,</span><span class="n">barcodes_updated</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">check</span><span class="p">(</span><span class="n">image</span><span class="p">,</span><span class="n">threshold</span><span class="o">=</span><span class="mf">0.75</span><span class="p">):</span>
+    <span class="n">white</span><span class="o">=</span><span class="mi">200</span>
+    <span class="n">white_pixels</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">image</span><span class="o">&gt;=</span><span class="n">white</span><span class="p">,</span><span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">))</span>
+    <span class="n">total</span> <span class="o">=</span> <span class="n">image</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">*</span><span class="n">image</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">percent</span> <span class="o">=</span> <span class="n">white_pixels</span><span class="o">/</span><span class="n">total</span>
+    <span class="k">return</span> <span class="n">percent</span><span class="o">&gt;</span><span class="n">threshold</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">check_cropping</span><span class="p">(</span><span class="n">samples</span><span class="p">,</span><span class="n">image</span><span class="p">,</span><span class="n">name</span><span class="p">,</span><span class="n">spatial_pos_csv</span><span class="p">,</span><span class="n">barcode_csv</span><span class="p">,</span><span class="n">res</span><span class="p">,</span><span class="n">root_path</span><span class="p">):</span>
+    <span class="n">cropped_images</span><span class="o">=</span><span class="p">[]</span>
+    <span class="n">white_back_images</span><span class="o">=</span><span class="p">[]</span>
+    <span class="n">img_filtered_barcodes</span><span class="o">=</span><span class="p">[]</span>
+    <span class="n">img_file_paths</span><span class="o">=</span><span class="p">[]</span>
+    <span class="n">parent_dir</span> <span class="o">=</span> <span class="n">root_path</span> <span class="o">+</span> <span class="s2">&quot;H&amp;E patches/&quot;</span>  <span class="c1"># Change this to your target directory</span>
+    <span class="c1"># # Create folders</span>
+    <span class="k">for</span> <span class="n">folder</span> <span class="ow">in</span> <span class="n">samples</span><span class="p">:</span>
+        <span class="n">folder_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">parent_dir</span><span class="p">,</span> <span class="n">folder</span><span class="p">)</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">folder_path</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>  <span class="c1"># exist_ok=True prevents errors if the folder already exists</span>
+    <span class="n">wsi_reader</span> <span class="o">=</span> <span class="n">VirtualWSIReader</span><span class="p">(</span><span class="n">image</span><span class="p">,</span><span class="n">mpp</span><span class="o">=</span><span class="p">(</span><span class="n">res</span><span class="p">,</span><span class="n">res</span><span class="p">))</span>
+    <span class="k">for</span> <span class="n">each</span><span class="p">,</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">barcode_csv</span><span class="p">,</span><span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">barcode_csv</span><span class="p">))):</span>
+        <span class="n">v1</span> <span class="o">=</span>  <span class="n">spatial_pos_csv</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">spatial_pos_csv</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="n">each</span><span class="p">,</span><span class="mi">4</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="c1">#pixel_row_in_full_reS</span>
+        <span class="n">v2</span> <span class="o">=</span>  <span class="n">spatial_pos_csv</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">spatial_pos_csv</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="n">each</span><span class="p">,</span><span class="mi">5</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>  <span class="c1"># pixel_col_in_full_res</span>
+        <span class="n">patch_extractor</span> <span class="o">=</span> <span class="n">patchextraction</span><span class="o">.</span><span class="n">PointsPatchExtractor</span><span class="p">(</span><span class="n">input_img</span><span class="o">=</span><span class="n">wsi_reader</span><span class="p">,</span><span class="n">locations_list</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([(</span><span class="n">v2</span><span class="p">,</span><span class="n">v1</span><span class="p">)]),</span>
+                                                               <span class="n">resolution</span><span class="o">=</span><span class="n">res</span><span class="p">,</span><span class="n">patch_size</span><span class="o">=</span><span class="p">(</span><span class="mi">224</span><span class="p">,</span><span class="mi">224</span><span class="p">),</span> <span class="n">units</span><span class="o">=</span><span class="s1">&#39;mpp&#39;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">patch</span> <span class="ow">in</span> <span class="n">patch_extractor</span><span class="p">:</span>
+            <span class="n">cropped_image</span> <span class="o">=</span> <span class="n">patch</span>
+        <span class="k">if</span> <span class="n">check</span><span class="p">(</span><span class="n">cropped_image</span><span class="p">,</span><span class="mf">0.75</span><span class="p">):</span>
+            <span class="n">white_back_images</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">cropped_image</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">cropped_images</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">cropped_image</span><span class="p">)</span>
+            <span class="n">img_filtered_barcodes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">each</span><span class="p">)</span>
+            <span class="n">patch_image</span> <span class="o">=</span> <span class="n">Image</span><span class="o">.</span><span class="n">fromarray</span><span class="p">(</span><span class="n">cropped_image</span><span class="p">)</span>
+            <span class="n">patch_image</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">parent_dir</span><span class="o">+</span><span class="n">name</span><span class="o">+</span><span class="s2">&quot;/&quot;</span><span class="o">+</span><span class="n">each</span><span class="o">+</span><span class="s2">&quot;.png&quot;</span><span class="p">)</span> <span class="c1"># saving the spot image into Sample folder.</span>
+            <span class="n">img_file_paths</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">parent_dir</span><span class="o">+</span><span class="n">name</span><span class="o">+</span><span class="s2">&quot;/&quot;</span><span class="o">+</span><span class="n">each</span><span class="o">+</span><span class="s2">&quot;.png&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;More than 75% white background patches&quot;</span><span class="p">,</span><span class="nb">len</span><span class="p">(</span><span class="n">white_back_images</span><span class="p">),</span><span class="s2">&quot;True patches&quot;</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">cropped_images</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">img_filtered_barcodes</span><span class="p">,</span><span class="n">img_file_paths</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">image_processing</span><span class="p">(</span><span class="n">root_path</span><span class="p">,</span> <span class="n">samples</span><span class="p">,</span><span class="n">pixel_res</span><span class="p">,</span><span class="n">paths</span><span class="p">):</span>
+    <span class="n">img_fil_paths</span><span class="o">=</span><span class="p">[]</span>
+    <span class="n">img_fil_barcodes</span><span class="o">=</span><span class="p">[]</span>
+    <span class="k">for</span> <span class="n">each</span><span class="p">,</span> <span class="n">res</span><span class="p">,</span> <span class="n">path</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">samples</span><span class="p">,</span> <span class="n">pixel_res</span><span class="p">,</span><span class="n">paths</span><span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;SAMPLE Name: &quot;</span><span class="p">,</span> <span class="n">each</span><span class="p">)</span>
+        <span class="n">image_path</span> <span class="o">=</span> <span class="n">root_path</span> <span class="o">+</span> <span class="s2">&quot;wsis/&quot;</span> <span class="o">+</span> <span class="n">each</span> <span class="o">+</span> <span class="s2">&quot;.tif&quot;</span>
+        <span class="n">slide</span><span class="o">=</span><span class="n">openslide</span><span class="o">.</span><span class="n">OpenSlide</span><span class="p">(</span><span class="n">image_path</span><span class="p">)</span>
+        <span class="n">level_dims</span> <span class="o">=</span> <span class="n">slide</span><span class="o">.</span><span class="n">level_dimensions</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">image</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">slide</span><span class="o">.</span><span class="n">read_region</span><span class="p">((</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="mi">0</span><span class="p">,</span> <span class="n">level_dims</span><span class="p">)</span><span class="o">.</span><span class="n">convert</span><span class="p">(</span><span class="s2">&quot;RGB&quot;</span><span class="p">))</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Original Image Shape: &quot;</span><span class="p">,</span> <span class="n">image</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Pixel Resolution&quot;</span><span class="p">,</span> <span class="n">res</span><span class="p">)</span>
+        <span class="n">spatial_pos_path</span> <span class="o">=</span> <span class="n">root_path</span> <span class="o">+</span><span class="s2">&quot;tissue_position_lists/&quot;</span><span class="o">+</span> <span class="n">each</span> <span class="o">+</span> <span class="s2">&quot;_tissue_position_list.csv&quot;</span> <span class="c1"># if does not exist, please save the sample_name_tissue_position_list.csv into root data directory</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">Path</span><span class="p">(</span><span class="n">spatial_pos_path</span><span class="p">)</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+            <span class="n">Path</span><span class="p">(</span><span class="n">spatial_pos_path</span><span class="p">)</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="n">adata</span> <span class="o">=</span> <span class="n">sc</span><span class="o">.</span><span class="n">read_h5ad</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+            <span class="n">temp</span> <span class="o">=</span> <span class="n">adata</span><span class="o">.</span><span class="n">obs</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">:</span><span class="mi">5</span><span class="p">]</span>
+            <span class="n">new_order</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;in_tissue&#39;</span><span class="p">,</span> <span class="s1">&#39;array_row&#39;</span><span class="p">,</span> <span class="s1">&#39;array_col&#39;</span><span class="p">,</span><span class="s1">&#39;pxl_row_in_fullres&#39;</span><span class="p">,</span><span class="s1">&#39;pxl_col_in_fullres&#39;</span><span class="p">]</span>
+            <span class="n">temp</span><span class="o">=</span><span class="n">temp</span><span class="p">[</span><span class="n">new_order</span><span class="p">]</span>
+            <span class="n">temp</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">root_path</span> <span class="o">+</span><span class="s2">&quot;tissue_position_lists/&quot;</span> <span class="o">+</span> <span class="n">each</span> <span class="o">+</span> <span class="s2">&quot;_tissue_position_list.csv&quot;</span><span class="p">,</span> <span class="n">header</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span><span class="n">sep</span><span class="o">=</span><span class="s2">&quot;,&quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">pass</span>
+        <span class="n">barcode_path</span> <span class="o">=</span> <span class="n">root_path</span> <span class="o">+</span> <span class="s2">&quot;filtered_barcodes/&quot;</span><span class="o">+</span> <span class="n">each</span> <span class="o">+</span> <span class="s2">&quot;_sample_filtered_barcodes.tsv&quot;</span>
+        <span class="n">barcode_csv</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">barcode_path</span><span class="p">,</span> <span class="n">sep</span><span class="o">=</span><span class="s2">&quot;</span><span class="se">\t</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">header</span><span class="o">=</span><span class="kc">None</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
+        <span class="n">spatial_pos_csv</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">spatial_pos_path</span><span class="p">,</span> <span class="n">header</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">sep</span><span class="o">=</span><span class="s2">&quot;,&quot;</span><span class="p">)</span>
+        <span class="n">spatial_pos_csv</span> <span class="o">=</span> <span class="n">spatial_pos_csv</span><span class="p">[</span><span class="n">spatial_pos_csv</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span><span class="p">]</span>
+        <span class="n">img_filtered_barcodes</span><span class="p">,</span> <span class="n">img_file_paths</span> <span class="o">=</span> <span class="n">check_cropping</span><span class="p">(</span><span class="n">samples</span><span class="p">,</span><span class="n">image</span><span class="p">,</span> <span class="n">each</span><span class="p">,</span> <span class="n">spatial_pos_csv</span><span class="p">,</span> <span class="n">barcode_csv</span><span class="p">,</span> <span class="n">res</span><span class="p">,</span><span class="n">root_path</span><span class="p">)</span>
+        <span class="n">img_fil_barcodes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">img_filtered_barcodes</span><span class="p">)</span>
+        <span class="n">img_fil_paths</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">img_file_paths</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">img_fil_paths</span><span class="p">,</span><span class="n">img_fil_barcodes</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">filtering_pathway</span><span class="p">(</span><span class="n">pathway_dict</span><span class="p">,</span><span class="n">unique_common_genes</span><span class="p">,</span><span class="n">threshold_pathways</span><span class="o">=</span><span class="mf">0.70</span><span class="p">):</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Starting Pathway Filtering with 70% threshold&quot;</span><span class="p">)</span>
+    <span class="n">filtered_pathway_dic</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">keys</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">pathway_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">(),</span> <span class="n">pathway_dict</span><span class="o">.</span><span class="n">values</span><span class="p">()):</span>
+        <span class="n">intersection</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">unique_common_genes</span><span class="p">)</span><span class="o">.</span><span class="n">intersection</span><span class="p">(</span><span class="n">value</span><span class="p">))</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">intersection</span><span class="p">)</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">value</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="n">threshold_pathways</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">intersection</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="mi">20</span><span class="p">:</span>
+            <span class="n">filtered_pathway_dic</span><span class="p">[</span><span class="n">keys</span><span class="p">]</span> <span class="o">=</span> <span class="n">intersection</span>
+    <span class="k">return</span> <span class="n">filtered_pathway_dic</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">get_optimus_features</span><span class="p">(</span><span class="n">device</span><span class="p">,</span><span class="n">root_path</span><span class="p">,</span><span class="n">samples</span><span class="p">):</span>
+    <span class="c1"># login()  # perform login with your own huggingface key that can be obtained for H-OPtimus Huggingface. Skip login if key is already added.</span>
+    <span class="n">model</span> <span class="o">=</span> <span class="n">timm</span><span class="o">.</span><span class="n">create_model</span><span class="p">(</span><span class="s2">&quot;hf-hub:bioptimus/H-optimus-0&quot;</span><span class="p">,</span> <span class="n">pretrained</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">init_values</span><span class="o">=</span><span class="mf">1e-5</span><span class="p">,</span> <span class="n">dynamic_img_size</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">model</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+    <span class="n">model</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
+    <span class="n">transform</span> <span class="o">=</span> <span class="n">transforms</span><span class="o">.</span><span class="n">Compose</span><span class="p">([</span>
+        <span class="n">transforms</span><span class="o">.</span><span class="n">ToTensor</span><span class="p">(),</span>
+        <span class="n">transforms</span><span class="o">.</span><span class="n">Normalize</span><span class="p">(</span>
+            <span class="n">mean</span><span class="o">=</span><span class="p">(</span><span class="mf">0.707223</span><span class="p">,</span> <span class="mf">0.578729</span><span class="p">,</span> <span class="mf">0.703617</span><span class="p">),</span>
+            <span class="n">std</span><span class="o">=</span><span class="p">(</span><span class="mf">0.211883</span><span class="p">,</span> <span class="mf">0.230117</span><span class="p">,</span> <span class="mf">0.177517</span><span class="p">)</span>
+        <span class="p">),</span>
+    <span class="p">])</span>
+
+    <span class="k">with</span> <span class="n">torch</span><span class="o">.</span><span class="n">autocast</span><span class="p">(</span><span class="n">device_type</span><span class="o">=</span><span class="s2">&quot;cuda&quot;</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">float16</span><span class="p">):</span>
+        <span class="k">with</span> <span class="n">torch</span><span class="o">.</span><span class="n">inference_mode</span><span class="p">():</span>
+            <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">samples</span><span class="p">:</span>
+                <span class="n">feature_vectors</span> <span class="o">=</span> <span class="p">[]</span>
+                <span class="n">count</span> <span class="o">=</span> <span class="mi">0</span>
+                <span class="n">barcodes</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">root_path</span> <span class="o">+</span> <span class="s2">&quot;filtered_barcodes/&quot;</span> <span class="o">+</span> <span class="n">name</span> <span class="o">+</span> <span class="s2">&quot;_sample_filtered_barcodes_1.tsv&quot;</span><span class="p">,</span> <span class="n">sep</span><span class="o">=</span><span class="s2">&quot;</span><span class="se">\t</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">header</span><span class="o">=</span><span class="kc">None</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
+                <span class="k">for</span> <span class="n">bar</span> <span class="ow">in</span> <span class="n">barcodes</span><span class="p">:</span>
+                    <span class="n">image</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">imread</span><span class="p">(</span><span class="n">root_path</span> <span class="o">+</span> <span class="s2">&quot;H&amp;E patches/&quot;</span> <span class="o">+</span> <span class="n">name</span> <span class="o">+</span> <span class="s2">&quot;/&quot;</span> <span class="o">+</span> <span class="n">bar</span> <span class="o">+</span> <span class="s2">&quot;.png&quot;</span><span class="p">)</span>
+                    <span class="n">image</span> <span class="o">=</span> <span class="n">transform</span><span class="p">(</span><span class="n">cv2</span><span class="o">.</span><span class="n">cvtColor</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="n">cv2</span><span class="o">.</span><span class="n">COLOR_BGR2RGB</span><span class="p">))</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+                    <span class="n">features</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span class="n">image</span><span class="p">)</span>
+                    <span class="n">feature_vectors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">features</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">())</span>
+                    <span class="n">count</span> <span class="o">+=</span> <span class="mi">1</span>
+                <span class="n">feature_vectors</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">feature_vectors</span><span class="p">)</span>
+                <span class="n">feature_vectors</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">squeeze</span><span class="p">(</span><span class="n">feature_vectors</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+                <span class="n">np</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">root_path</span> <span class="o">+</span> <span class="s2">&quot;optimus_features/&quot;</span> <span class="o">+</span> <span class="n">name</span> <span class="o">+</span> <span class="s2">&quot;_image_features_optimus-h.npy&quot;</span><span class="p">,</span> <span class="n">feature_vectors</span><span class="p">)</span>
+                <span class="nb">print</span><span class="p">(</span><span class="n">feature_vectors</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="s2">&quot;Done&quot;</span><span class="p">)</span>
+    <span class="k">return</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">save_filtered_barcodes_gene</span><span class="p">(</span><span class="n">root_path</span><span class="p">,</span><span class="n">paths</span><span class="p">,</span><span class="n">barcodes</span><span class="p">,</span><span class="n">samples</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="nb">len</span><span class="p">(</span><span class="n">paths</span><span class="p">)):</span>
+        <span class="n">temp</span><span class="o">=</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">barcodes</span><span class="p">[</span><span class="n">i</span><span class="p">]))</span>
+        <span class="n">temp</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">root_path</span><span class="o">+</span><span class="s2">&quot;filtered_barcodes/&quot;</span><span class="o">+</span><span class="n">samples</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">+</span><span class="s2">&quot;_sample_filtered_barcodes.tsv&quot;</span><span class="p">,</span><span class="n">sep</span><span class="o">=</span><span class="s2">&quot;</span><span class="se">\t</span><span class="s2">&quot;</span><span class="p">,</span><span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span><span class="n">header</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+    <span class="k">return</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">save_filtered_barcodes_image</span><span class="p">(</span><span class="n">root_path</span><span class="p">,</span><span class="n">img_fil_barcodes</span><span class="p">,</span><span class="n">img_fil_paths</span><span class="p">,</span><span class="n">samples</span><span class="p">):</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Final Sample-wise Filtered data shape......&quot;</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">bars</span><span class="p">,</span> <span class="n">fp</span><span class="p">,</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">img_fil_barcodes</span><span class="p">,</span> <span class="n">img_fil_paths</span><span class="p">,</span> <span class="n">samples</span><span class="p">):</span> <span class="c1"># saving the spot-level filtered images and their file paths.</span>
+        <span class="n">temp</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">bars</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">temp</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">fp</span><span class="p">))</span>
+        <span class="n">temp</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">root_path</span> <span class="o">+</span> <span class="s2">&quot;filtered_barcodes/&quot;</span> <span class="o">+</span> <span class="n">i</span> <span class="o">+</span> <span class="s2">&quot;_sample_filtered_barcodes_1.tsv&quot;</span><span class="p">,</span> <span class="n">sep</span><span class="o">=</span><span class="s2">&quot;</span><span class="se">\t</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">header</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+        <span class="n">np</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">root_path</span> <span class="o">+</span> <span class="s2">&quot;H&amp;E patches/&quot;</span> <span class="o">+</span> <span class="n">i</span> <span class="o">+</span> <span class="s2">&quot;_sample_file_paths.npy&quot;</span><span class="p">,</span> <span class="n">fp</span><span class="p">)</span>
+    <span class="k">return</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">save_gene_exp_data</span><span class="p">(</span><span class="n">root_path</span><span class="p">,</span><span class="n">filtered_exp_mtxs</span><span class="p">,</span><span class="n">samples</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">each</span><span class="p">,</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">filtered_exp_mtxs</span><span class="p">,</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">samples</span><span class="p">))):</span>
+        <span class="n">aa</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">root_path</span> <span class="o">+</span> <span class="s2">&quot;filtered_barcodes/&quot;</span> <span class="o">+</span> <span class="n">samples</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">+</span> <span class="s2">&quot;_sample_filtered_barcodes_1.tsv&quot;</span><span class="p">,</span> <span class="n">sep</span><span class="o">=</span><span class="s2">&quot;</span><span class="se">\t</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">header</span><span class="o">=</span><span class="kc">None</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
+        <span class="n">bb</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">root_path</span> <span class="o">+</span> <span class="s2">&quot;filtered_barcodes/&quot;</span> <span class="o">+</span> <span class="n">samples</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">+</span> <span class="s2">&quot;_sample_filtered_barcodes.tsv&quot;</span><span class="p">,</span> <span class="n">sep</span><span class="o">=</span><span class="s2">&quot;</span><span class="se">\t</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">header</span><span class="o">=</span><span class="kc">None</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
+        <span class="n">common_indices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">intersect1d</span><span class="p">(</span><span class="n">aa</span><span class="p">,</span> <span class="n">bb</span><span class="p">)</span>
+        <span class="n">mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">bb</span><span class="p">,</span> <span class="n">common_indices</span><span class="p">)</span>
+        <span class="n">temp</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">each</span><span class="o">.</span><span class="n">toarray</span><span class="p">())[</span><span class="n">mask</span><span class="p">]</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">temp</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+        <span class="n">np</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">root_path</span> <span class="o">+</span> <span class="s2">&quot;filtered_gene_expression/&quot;</span> <span class="o">+</span> <span class="n">samples</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">+</span> <span class="s2">&quot;_sample_unique_genes_pathways_samples.npy&quot;</span><span class="p">,</span> <span class="n">temp</span><span class="p">)</span>
+    <span class="k">return</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">create_objects_for_ucell</span><span class="p">(</span><span class="n">root_path</span><span class="p">,</span><span class="n">samples</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">each</span> <span class="ow">in</span> <span class="n">samples</span><span class="p">:</span>
+        <span class="n">cell_names</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">root_path</span> <span class="o">+</span> <span class="s2">&quot;filtered_barcodes/&quot;</span> <span class="o">+</span> <span class="n">each</span> <span class="o">+</span> <span class="s2">&quot;_sample_filtered_barcodes_1.tsv&quot;</span><span class="p">,</span><span class="n">sep</span><span class="o">=</span><span class="s2">&quot;</span><span class="se">\t</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">header</span><span class="o">=</span><span class="kc">None</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
+        <span class="n">sample</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">root_path</span> <span class="o">+</span> <span class="s2">&quot;filtered_gene_expression/&quot;</span> <span class="o">+</span> <span class="n">each</span> <span class="o">+</span> <span class="s2">&quot;_sample_unique_genes_pathways_samples.npy&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">T</span>  <span class="c1"># original or predicted sample.</span>
+        <span class="c1"># print(sample.shape, cell_names.shape)</span>
+        <span class="n">gene_names</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">root_path</span><span class="o">+</span><span class="n">cfg</span><span class="o">.</span><span class="n">dataset</span><span class="o">+</span><span class="s1">&#39;_unique_common_genes.npy&#39;</span><span class="p">,</span><span class="n">allow_pickle</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">scipy</span><span class="o">.</span><span class="n">io</span><span class="o">.</span><span class="n">savemat</span><span class="p">(</span><span class="n">root_path</span> <span class="o">+</span> <span class="s2">&quot;data for Ucell calculations/&quot;</span><span class="o">+</span> <span class="n">each</span> <span class="o">+</span> <span class="s2">&quot;_data.mat&quot;</span><span class="p">,{</span><span class="s1">&#39;x&#39;</span><span class="p">:</span> <span class="n">sample</span><span class="p">,</span> <span class="s1">&#39;gene_names&#39;</span><span class="p">:</span> <span class="n">gene_names</span><span class="p">,</span> <span class="s1">&#39;cell_names&#39;</span><span class="p">:</span> <span class="n">cell_names</span><span class="p">})</span> <span class="c1"># this data will be used in UCell.R code to get the pathway expression matrix of Spots x pathways</span>
+    <span class="k">return</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">calculate_Rmax_threshold</span><span class="p">(</span><span class="n">root_path</span><span class="p">,</span><span class="n">samples</span><span class="p">):</span>
+    <span class="n">res</span><span class="o">=</span><span class="p">[]</span>
+    <span class="k">for</span> <span class="n">sample</span> <span class="ow">in</span> <span class="n">samples</span><span class="p">:</span>
+        <span class="n">temp</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">root_path</span><span class="o">+</span><span class="s2">&quot;filtered_gene_expression/&quot;</span><span class="o">+</span><span class="n">sample</span><span class="o">+</span><span class="s2">&quot;_sample_unique_genes_pathways_samples.npy&quot;</span><span class="p">)</span>
+        <span class="n">sorted_arr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">temp</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)[:,</span> <span class="p">::</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">zero_indices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">sorted_arr</span> <span class="o">==</span> <span class="mi">0</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">each</span> <span class="ow">in</span> <span class="n">zero_indices</span><span class="p">:</span>
+            <span class="n">res</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">each</span><span class="p">)</span>
+<span class="c1">#         res.append(np.median(zero_indices))</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Rmax Threshold for this data with global median is: &quot;</span><span class="p">,</span><span class="n">np</span><span class="o">.</span><span class="n">median</span><span class="p">(</span><span class="n">res</span><span class="p">))</span>  <span class="c1"># Array of indices where the first 0 appears in each row</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">median</span><span class="p">(</span><span class="n">res</span><span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">get_adata_object</span><span class="p">(</span><span class="n">tissue_position_list_data</span><span class="p">,</span><span class="n">scalefactor_file_path</span><span class="p">,</span><span class="n">data_array</span><span class="p">,</span><span class="n">hi_res_image_data</span><span class="p">,</span><span class="n">g_names</span><span class="p">,</span><span class="n">barcode_names</span><span class="p">):</span>
+    <span class="n">spatial</span> <span class="o">=</span> <span class="n">tissue_position_list_data</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">tissue_position_list_data</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span><span class="p">,</span> <span class="p">[</span><span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">]]</span><span class="o">.</span><span class="n">values</span>
+    <span class="n">reversed_array</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="n">sub_array</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">sub_array</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span> <span class="k">for</span> <span class="n">sub_array</span> <span class="ow">in</span> <span class="n">spatial</span><span class="p">])</span>
+    <span class="n">scalefactor_data</span> <span class="o">=</span> <span class="n">scalefactor_file_path</span>
+    <span class="n">adata</span> <span class="o">=</span> <span class="n">sc</span><span class="o">.</span><span class="n">AnnData</span><span class="p">(</span><span class="n">X</span><span class="o">=</span><span class="n">data_array</span><span class="p">)</span>
+    <span class="k">if</span> <span class="s1">&#39;spatial&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">adata</span><span class="o">.</span><span class="n">uns</span><span class="p">:</span>
+        <span class="n">adata</span><span class="o">.</span><span class="n">uns</span><span class="p">[</span><span class="s1">&#39;spatial&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">if</span> <span class="s1">&#39;C1&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">adata</span><span class="o">.</span><span class="n">uns</span><span class="p">[</span><span class="s1">&#39;spatial&#39;</span><span class="p">]:</span>
+        <span class="n">adata</span><span class="o">.</span><span class="n">uns</span><span class="p">[</span><span class="s1">&#39;spatial&#39;</span><span class="p">][</span><span class="s1">&#39;ST&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+
+    <span class="k">if</span> <span class="s1">&#39;images&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">adata</span><span class="o">.</span><span class="n">uns</span><span class="p">[</span><span class="s1">&#39;spatial&#39;</span><span class="p">]:</span>
+        <span class="n">adata</span><span class="o">.</span><span class="n">uns</span><span class="p">[</span><span class="s1">&#39;spatial&#39;</span><span class="p">][</span><span class="s1">&#39;ST&#39;</span><span class="p">][</span><span class="s1">&#39;images&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+
+    <span class="k">if</span> <span class="s1">&#39;scalefactors&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">adata</span><span class="o">.</span><span class="n">uns</span><span class="p">:</span>
+        <span class="n">adata</span><span class="o">.</span><span class="n">uns</span><span class="p">[</span><span class="s1">&#39;spatial&#39;</span><span class="p">][</span><span class="s1">&#39;ST&#39;</span><span class="p">][</span><span class="s1">&#39;scalefactors&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">adata</span><span class="o">.</span><span class="n">var_names</span> <span class="o">=</span> <span class="n">g_names</span>
+    <span class="n">adata</span><span class="o">.</span><span class="n">uns</span><span class="p">[</span><span class="s1">&#39;spatial&#39;</span><span class="p">][</span><span class="s1">&#39;ST&#39;</span><span class="p">][</span><span class="s1">&#39;images&#39;</span><span class="p">][</span><span class="s1">&#39;downscaled_fullres&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">hi_res_image_data</span>
+    <span class="n">adata</span><span class="o">.</span><span class="n">obsm</span><span class="p">[</span><span class="s1">&#39;spatial&#39;</span><span class="p">]</span><span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">reversed_array</span><span class="p">)</span>
+    <span class="n">adata</span><span class="o">.</span><span class="n">uns</span><span class="p">[</span><span class="s1">&#39;spatial&#39;</span><span class="p">][</span><span class="s1">&#39;ST&#39;</span><span class="p">][</span><span class="s1">&#39;scalefactors&#39;</span><span class="p">]</span><span class="o">=</span><span class="n">scalefactor_data</span>
+    <span class="n">new_df</span><span class="o">=</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">()</span>
+    <span class="n">new_df</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="n">tissue_position_list_data</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
+    <span class="n">new_df</span><span class="p">[</span><span class="s1">&#39;in_tissue&#39;</span><span class="p">]</span><span class="o">=</span><span class="n">tissue_position_list_data</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
+    <span class="n">new_df</span><span class="p">[</span><span class="s1">&#39;array_row&#39;</span><span class="p">]</span><span class="o">=</span><span class="n">tissue_position_list_data</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
+    <span class="n">new_df</span><span class="p">[</span><span class="s1">&#39;array_col&#39;</span><span class="p">]</span><span class="o">=</span><span class="n">tissue_position_list_data</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
+    <span class="n">new_df</span><span class="p">[</span><span class="s1">&#39;pxl_row_in_fullres&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">tissue_position_list_data</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
+    <span class="n">new_df</span><span class="p">[</span><span class="s1">&#39;pxl_col_in_fullres&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">tissue_position_list_data</span><span class="p">[</span><span class="mi">5</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
+    <span class="n">adata</span><span class="o">.</span><span class="n">obs</span><span class="o">=</span><span class="n">new_df</span>
+    <span class="k">return</span> <span class="n">adata</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">Sdata_creation</span><span class="p">(</span><span class="n">root_path</span><span class="p">,</span><span class="n">samples</span><span class="p">,</span><span class="n">pathway_dict</span><span class="p">,</span><span class="n">dataset</span><span class="o">=</span><span class="s1">&#39;prostate&#39;</span><span class="p">):</span>
+    <span class="n">pathway_names</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">pathway_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+    <span class="k">for</span> <span class="n">each</span> <span class="ow">in</span> <span class="n">samples</span><span class="p">:</span>
+        <span class="n">adata</span> <span class="o">=</span> <span class="n">sc</span><span class="o">.</span><span class="n">read_h5ad</span><span class="p">(</span><span class="n">root_path</span><span class="o">+</span><span class="s2">&quot;st/&quot;</span><span class="o">+</span><span class="n">each</span><span class="o">+</span><span class="s2">&quot;.h5ad&quot;</span><span class="p">)</span>
+        <span class="n">data_array</span><span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">root_path</span><span class="o">+</span><span class="s2">&quot;pathway expression/&quot;</span><span class="o">+</span><span class="n">each</span><span class="o">+</span><span class="s2">&quot;_pathway expression.csv&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:,</span><span class="mi">1</span><span class="p">:])</span>
+        <span class="n">tissue_position_list_data</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">root_path</span><span class="o">+</span><span class="s2">&quot;tissue_position_lists/&quot;</span><span class="o">+</span><span class="n">each</span><span class="o">+</span><span class="s2">&quot;_tissue_position_list.csv&quot;</span><span class="p">,</span><span class="n">sep</span><span class="o">=</span><span class="s2">&quot;,&quot;</span><span class="p">,</span><span class="n">header</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+        <span class="n">tissue_position_list_data</span> <span class="o">=</span> <span class="n">tissue_position_list_data</span><span class="p">[</span><span class="n">tissue_position_list_data</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">==</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">barcode_data</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">root_path</span><span class="o">+</span><span class="s2">&quot;filtered_barcodes/&quot;</span><span class="o">+</span><span class="n">each</span><span class="o">+</span><span class="s2">&quot;_sample_filtered_barcodes_1.tsv&quot;</span><span class="p">,</span><span class="n">sep</span><span class="o">=</span><span class="s2">&quot;</span><span class="se">\t</span><span class="s2">&quot;</span><span class="p">,</span><span class="n">header</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+        <span class="n">res</span><span class="o">=</span><span class="p">[]</span>
+        <span class="k">for</span> <span class="n">bar</span> <span class="ow">in</span> <span class="n">barcode_data</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span>
+            <span class="n">temp</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">tissue_position_list_data</span><span class="p">[</span><span class="n">tissue_position_list_data</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">==</span><span class="n">bar</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="n">res</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">temp</span><span class="p">)</span>
+        <span class="n">res</span><span class="o">=</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">res</span><span class="p">)</span>
+        <span class="n">tissue_position_list_data</span> <span class="o">=</span> <span class="n">res</span>
+        <span class="n">scalefactor_file_path</span><span class="o">=</span><span class="n">adata</span><span class="o">.</span><span class="n">uns</span><span class="p">[</span><span class="s1">&#39;spatial&#39;</span><span class="p">][</span><span class="s1">&#39;ST&#39;</span><span class="p">][</span><span class="s1">&#39;scalefactors&#39;</span><span class="p">]</span>
+        <span class="n">hi_res_image_data</span> <span class="o">=</span> <span class="n">adata</span><span class="o">.</span><span class="n">uns</span><span class="p">[</span><span class="s1">&#39;spatial&#39;</span><span class="p">][</span><span class="s1">&#39;ST&#39;</span><span class="p">][</span><span class="s1">&#39;images&#39;</span><span class="p">][</span><span class="s1">&#39;downscaled_fullres&#39;</span><span class="p">]</span>
+        <span class="n">adata_pathway</span> <span class="o">=</span><span class="n">get_adata_object</span><span class="p">(</span><span class="n">tissue_position_list_data</span><span class="p">,</span><span class="n">scalefactor_file_path</span><span class="p">,</span><span class="n">data_array</span><span class="p">,</span><span class="n">hi_res_image_data</span><span class="p">,</span><span class="n">pathway_names</span><span class="p">,</span><span class="n">barcode_data</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">)</span>
+        <span class="n">optim_feat</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">cfg</span><span class="o">.</span><span class="n">root_path</span><span class="o">+</span><span class="s2">&quot;optimus_features/&quot;</span><span class="o">+</span><span class="n">each</span><span class="o">+</span><span class="s2">&quot;_image_features_optimus-h.npy&quot;</span><span class="p">)</span>
+        <span class="n">gene_exp</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">root_path</span><span class="o">+</span><span class="s2">&quot;/filtered_gene_expression/&quot;</span><span class="o">+</span><span class="n">each</span><span class="o">+</span><span class="s2">&quot;_sample_unique_genes_pathways_samples.npy&quot;</span><span class="p">)</span>
+        <span class="n">adata_optim</span> <span class="o">=</span> <span class="n">sc</span><span class="o">.</span><span class="n">AnnData</span><span class="p">(</span><span class="n">X</span><span class="o">=</span><span class="n">optim_feat</span><span class="p">)</span>
+        <span class="n">adata_optim</span><span class="o">.</span><span class="n">obs</span> <span class="o">=</span> <span class="n">adata_pathway</span><span class="o">.</span><span class="n">obs</span>
+        <span class="n">adata_optim</span><span class="o">.</span><span class="n">uns</span><span class="o">=</span><span class="n">adata_pathway</span><span class="o">.</span><span class="n">uns</span>
+        <span class="n">adata_pathway</span><span class="o">.</span><span class="n">var_names</span> <span class="o">=</span> <span class="n">pathway_names</span>
+        <span class="n">adata_optim</span><span class="o">.</span><span class="n">obsm</span> <span class="o">=</span> <span class="n">adata_pathway</span><span class="o">.</span><span class="n">obsm</span>
+        <span class="n">adata_genes</span> <span class="o">=</span> <span class="n">sc</span><span class="o">.</span><span class="n">AnnData</span><span class="p">(</span><span class="n">X</span><span class="o">=</span><span class="n">gene_exp</span><span class="p">)</span>
+        <span class="n">adata_genes</span><span class="o">.</span><span class="n">obs</span><span class="o">=</span><span class="n">adata_pathway</span><span class="o">.</span><span class="n">obs</span>
+        <span class="n">adata_genes</span><span class="o">.</span><span class="n">uns</span><span class="o">=</span><span class="n">adata_pathway</span><span class="o">.</span><span class="n">uns</span>
+        <span class="n">adata_genes</span><span class="o">.</span><span class="n">obsm</span><span class="o">=</span> <span class="n">adata_pathway</span><span class="o">.</span><span class="n">obsm</span>
+        <span class="n">adata_genes</span><span class="o">.</span><span class="n">var_names</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">root_path</span><span class="o">+</span><span class="n">dataset</span><span class="o">+</span><span class="s2">&quot;_unique_common_genes.npy&quot;</span><span class="p">,</span><span class="n">allow_pickle</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="c1">#     adata_for_sdata = TableModel.parse(adata)</span>
+    <span class="c1">#     adata_for_sdata=from_legacy_anndata(adata)</span>
+        <span class="n">sdata</span><span class="o">=</span><span class="n">SpatialData</span><span class="p">(</span><span class="n">tables</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;adata_pathways&quot;</span><span class="p">:</span><span class="n">adata_pathway</span><span class="p">},)</span>
+        <span class="n">sdata</span><span class="o">.</span><span class="n">tables</span><span class="p">[</span><span class="s1">&#39;optim_feat&#39;</span><span class="p">]</span><span class="o">=</span><span class="n">adata_optim</span>
+        <span class="n">sdata</span><span class="o">.</span><span class="n">tables</span><span class="p">[</span><span class="s1">&#39;filtered_gene_exp&#39;</span><span class="p">]</span><span class="o">=</span><span class="n">adata_genes</span>
+        <span class="n">sdata</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">root_path</span><span class="o">+</span><span class="s2">&quot;/SpatialData/&quot;</span><span class="o">+</span><span class="n">each</span><span class="o">+</span><span class="s2">&quot;_spatial_data.zarr&quot;</span><span class="p">,</span><span class="n">overwrite</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="k">return</span>
+<br/></pre></div>
+</div>
+</div>
+<section id="Calculating-total-number-of-genes-in-the-pathway-database">
+<h3>Calculating total number of genes in the pathway database<a class="headerlink" href="#Calculating-total-number-of-genes-in-the-pathway-database" title="Link to this heading"></a></h3>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">root_path</span> <span class="o">=</span> <span class="n">cfg</span><span class="o">.</span><span class="n">root_path</span>
+<span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">cfg</span><span class="o">.</span><span class="n">pathway_dict_file</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+    <span class="n">pathway_dict</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span> <span class="c1"># replace with required pathway database, i.e., GO/KEGG/MsigDB</span>
+<span class="n">uni_pathway_genes</span><span class="o">=</span><span class="p">[]</span>
+<span class="k">for</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">pathway_dict</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
+    <span class="k">for</span> <span class="n">each</span> <span class="ow">in</span> <span class="n">value</span><span class="p">:</span>
+        <span class="n">uni_pathway_genes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">each</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Total Number of unique genes in all pathways: &quot;</span><span class="p">,</span><span class="nb">len</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">uni_pathway_genes</span><span class="p">)))</span> <span class="c1"># replace with required pathway database, i.e., GO/KEGG/MsigDB</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Total Number of unique genes in all pathways:  4383
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">paths</span><span class="o">=</span><span class="p">[]</span>
+<span class="n">samples</span><span class="o">=</span><span class="nb">list</span><span class="p">()</span>
+<span class="n">filtered_exp_mtxs</span><span class="o">=</span><span class="nb">list</span><span class="p">()</span>
+<span class="n">barcodes</span><span class="o">=</span><span class="nb">list</span><span class="p">()</span>
+<span class="n">samples</span> <span class="o">=</span> <span class="n">cfg</span><span class="o">.</span><span class="n">all_samples</span>
+<span class="k">for</span> <span class="n">each</span> <span class="ow">in</span> <span class="n">samples</span><span class="p">:</span>
+    <span class="n">paths</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">root_path</span><span class="o">+</span><span class="s2">&quot;st/&quot;</span><span class="o">+</span><span class="n">each</span><span class="o">+</span><span class="s2">&quot;.h5ad&quot;</span><span class="p">)</span>
+<span class="n">unique_genes</span><span class="o">=</span> <span class="n">get_adata</span><span class="p">(</span><span class="n">paths</span><span class="p">,</span><span class="n">uni_pathway_genes</span><span class="p">)</span>
+<span class="n">filtered_exp_mtxs</span><span class="p">,</span> <span class="n">barcodes</span> <span class="o">=</span> <span class="n">save_adatas</span><span class="p">(</span><span class="n">paths</span><span class="p">,</span><span class="n">unique_genes</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Saving the Filtered Barcodes after spot filtering&quot;</span><span class="p">)</span>
+<span class="n">save_filtered_barcodes_gene</span><span class="p">(</span><span class="n">root_path</span><span class="p">,</span> <span class="n">paths</span><span class="p">,</span> <span class="n">barcodes</span><span class="p">,</span> <span class="n">samples</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+|2025-11-18|18:02:39.723| [WARNING] /home/e90244aa/anaconda3/envs/bleep_env/lib/python3.10/site-packages/numba/np/ufunc/parallel.py:371: NumbaWarning: <span class="ansi-bold">The TBB threading layer requires TBB version 2021 update 6 or later i.e., TBB_INTERFACE_VERSION &gt;= 12060. Found TBB_INTERFACE_VERSION = 12050. The TBB threading layer is disabled.</span>
+  warnings.warn(problem)
+
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+10000 10000
+No. of unique genes after filtering 11866
+No. of Common genes between unique pathway genes and unique filtered genes from all samples 2689
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+|2025-11-18|18:02:40.542| [WARNING] /home/e90244aa/.local/lib/python3.10/site-packages/scanpy/preprocessing/_simple.py:176: ImplicitModificationWarning: Trying to modify attribute `.obs` of view, initializing view as actual.
+  adata.obs[&#34;n_genes&#34;] = number
+
+|2025-11-18|18:02:43.045| [WARNING] /home/e90244aa/.local/lib/python3.10/site-packages/scanpy/preprocessing/_simple.py:176: ImplicitModificationWarning: Trying to modify attribute `.obs` of view, initializing view as actual.
+  adata.obs[&#34;n_genes&#34;] = number
+
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+(4072, 11866)
+(3569, 11866)
+Saving the Filtered Barcodes after spot filtering
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">samples</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+[&#39;MEND61&#39;, &#39;MEND62&#39;]
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Starting Image Processing......&quot;</span><span class="p">)</span>
+<span class="n">pixel_res</span> <span class="o">=</span> <span class="n">cfg</span><span class="o">.</span><span class="n">mpp_res</span>  <span class="c1"># Image pixel res are obtained from the Metadata file, provided by HEST-1K database</span>
+<span class="n">img_fil_paths</span><span class="p">,</span> <span class="n">img_fil_barcodes</span> <span class="o">=</span> <span class="n">image_processing</span><span class="p">(</span><span class="n">root_path</span><span class="p">,</span> <span class="n">samples</span><span class="p">,</span> <span class="n">pixel_res</span><span class="p">,</span> <span class="n">paths</span><span class="p">)</span>
+<span class="n">save_filtered_barcodes_image</span><span class="p">(</span><span class="n">root_path</span><span class="p">,</span> <span class="n">img_fil_barcodes</span><span class="p">,</span> <span class="n">img_fil_paths</span><span class="p">,</span> <span class="n">samples</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Starting Image Processing......
+SAMPLE Name:  MEND61
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+|2025-11-18|18:04:23.079| [WARNING] Raw data is None.
+|2025-11-18|18:04:23.080| [WARNING] Unknown scale (no objective_power or mpp)
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Original Image Shape:  (48128, 47616, 3)
+Pixel Resolution 0.1720746926257395
+More than 75% white background patches 0 True patches 4072
+SAMPLE Name:  MEND62
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+|2025-11-18|18:06:47.738| [WARNING] Raw data is None.
+|2025-11-18|18:06:47.739| [WARNING] Unknown scale (no objective_power or mpp)
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Original Image Shape:  (48128, 47616, 3)
+Pixel Resolution 0.1721762166660063
+More than 75% white background patches 0 True patches 3569
+Final Sample-wise Filtered data shape......
+MEND61 (4072, 1) 4072
+MEND62 (3569, 1) 3569
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Saving the pathway-associated unique common genes&quot;</span><span class="p">)</span>
+<span class="n">save_gene_exp_data</span><span class="p">(</span><span class="n">root_path</span><span class="p">,</span> <span class="n">filtered_exp_mtxs</span><span class="p">,</span> <span class="n">samples</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Saving Unique Common Genes:, &quot;</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">unique_genes</span><span class="p">))</span>
+<span class="n">np</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">root_path</span> <span class="o">+</span> <span class="n">cfg</span><span class="o">.</span><span class="n">dataset</span><span class="o">+</span><span class="s1">&#39;_unique_common_genes.npy&#39;</span><span class="p">,</span> <span class="n">unique_genes</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Saving the pathway-associated unique common genes
+(4072, 11866)
+(3569, 11866)
+Saving Unique Common Genes:,  11866
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Saving the filtered pathway dict in JSON&quot;</span><span class="p">)</span>
+<span class="n">filtered_pathway_dic</span> <span class="o">=</span> <span class="n">filtering_pathway</span><span class="p">(</span><span class="n">pathway_dict</span><span class="p">,</span> <span class="n">unique_genes</span><span class="p">,</span> <span class="n">threshold_pathways</span><span class="o">=</span><span class="n">cfg</span><span class="o">.</span><span class="n">threshold_pathways</span><span class="p">)</span> <span class="c1">#more than or equal to 70% pathway genes should be in data to calculate pathway expr. .</span>
+<span class="n">file_path</span> <span class="o">=</span> <span class="n">root_path</span> <span class="o">+</span> <span class="s1">&#39;pathway_dict_&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">filtered_pathway_dic</span><span class="p">))</span> <span class="o">+</span> <span class="s1">&#39;.json&#39;</span>
+<span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">file_path</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">json_file</span><span class="p">:</span>
+    <span class="n">json</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">filtered_pathway_dic</span><span class="p">,</span> <span class="n">json_file</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Saving the filtered pathway dict in JSON
+Starting Pathway Filtering with 70% threshold
+</pre></div></div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">create_objects_for_ucell</span><span class="p">(</span><span class="n">root_path</span><span class="p">,</span> <span class="n">samples</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">rmax</span> <span class="o">=</span> <span class="n">calculate_Rmax_threshold</span><span class="p">(</span><span class="n">root_path</span><span class="p">,</span><span class="n">samples</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;*********************************************************************************&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Please use the following data in UCell.R code to compute Ucell Scores:&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Filtered Pathway Dictionary file:&quot;</span><span class="p">,</span><span class="n">file_path</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Samples List:&quot;</span><span class="p">,</span><span class="n">samples</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Data for UCell with path:&quot;</span><span class="p">,</span><span class="s2">&quot;./data for Ucell calculations/SAMPLE_ID_data.mat&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Rmax=&quot;</span><span class="p">,</span><span class="n">rmax</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Ucell Processed Filepath: ./pathway expression/SAMPLE_ID_pathway expression.csv&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;*********************************************************************************&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Rmax Threshold for this data with global median is:  1543.0
+*********************************************************************************
+
+Please use the following data in UCell.R code to compute Ucell Scores:
+Filtered Pathway Dictionary file: /home/e90244aa/Bleep/DeepPathwayV2/prostate cancer dataset/pathway_dict_20.json
+Samples List: [&#39;MEND61&#39;, &#39;MEND62&#39;]
+Data for UCell with path: ./data for Ucell calculations/SAMPLE_ID_data.mat
+Rmax= 1543.0
+Ucell Processed Filepath: ./pathway expression/SAMPLE_ID_pathway expression.csv
+
+*********************************************************************************
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[14]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Starting H-Optimus-0 Feature Extraction Process.....&quot;</span><span class="p">)</span> <span class="c1"># Obtain login key from Huggingface using https://huggingface.co/bioptimus/H-optimus-0</span>
+<span class="n">get_optimus_features</span><span class="p">(</span><span class="n">cfg</span><span class="o">.</span><span class="n">device</span><span class="p">,</span> <span class="n">root_path</span><span class="p">,</span> <span class="n">samples</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Starting H-Optimus-0 Feature Extraction Process.....
+|2025-11-18|18:21:48.553| [INFO] Loading pretrained weights from Hugging Face hub (bioptimus/H-optimus-0)
+(4072, 1536) Done
+(3569, 1536) Done
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[15]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Saving processed data as SpatialData Objects&quot;</span><span class="p">)</span>
+<span class="n">Sdata_creation</span><span class="p">(</span><span class="n">root_path</span><span class="p">,</span><span class="n">samples</span><span class="p">,</span><span class="n">filtered_pathway_dic</span><span class="p">,</span><span class="n">dataset</span><span class="o">=</span><span class="n">cfg</span><span class="o">.</span><span class="n">dataset</span><span class="p">)</span> <span class="c1">#All processed data will be saved to SpatialData object for fast access and processing.</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Saving processed data as SpatialData Objects
+<span class="ansi-blue-fg">INFO    </span> The Zarr backing store has been changed from <span class="ansi-magenta-fg">None</span> the new file path:
+         <span class="ansi-magenta-fg">/home/e90244aa/Bleep/DeepPathwayV2/</span><span class="ansi-magenta-intense-fg">prostate</span> cancer dataset/SpatialData/MEND61_spatial_data.zarr
+<span class="ansi-blue-fg">INFO    </span> The Zarr backing store has been changed from <span class="ansi-magenta-fg">None</span> the new file path:
+         <span class="ansi-magenta-fg">/home/e90244aa/Bleep/DeepPathwayV2/</span><span class="ansi-magenta-intense-fg">prostate</span> cancer dataset/SpatialData/MEND62_spatial_data.zarr
+</pre></div></div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">a</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="n">filtered_pathway_dic</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[14]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">root_path</span>  <span class="o">=</span> <span class="s2">&quot;/home/e90244aa/Bleep/prostate cancer/&quot;</span>
+<span class="n">second_path</span> <span class="o">=</span> <span class="s2">&quot;bleep_pathway_expression/&quot;</span>
+
+<span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">root_path</span><span class="o">+</span><span class="n">second_path</span><span class="o">+</span><span class="s2">&quot;pathway_dic_prostate_msig47.json&quot;</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+    <span class="n">patient2_pathway_dict</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span> <span class="c1"># replace with required pathway database, i.e., GO/KEGG/MsigDB</span>
+<span class="n">b</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="n">patient2_pathway_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[15]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># a=[&#39;TNF-alpha Signaling via NF-kB&#39;, &#39;Hypoxia&#39;, &#39;Cholesterol Homeostasis&#39;, &#39;Mitotic Spindle&#39;, &#39;Wnt-beta Catenin Signaling&#39;, &#39;TGF-beta Signaling&#39;, &#39;IL-6/JAK/STAT3 Signaling&#39;, &#39;DNA Repair&#39;, &#39;G2-M Checkpoint&#39;, &#39;Apoptosis&#39;, &#39;Notch Signaling&#39;, &#39;Adipogenesis&#39;, &#39;Estrogen Response Early&#39;, &#39;Estrogen Response Late&#39;, &#39;Androgen Response&#39;, &#39;Myogenesis&#39;, &#39;Protein Secretion&#39;, &#39;Interferon Alpha Response&#39;, &#39;Interferon Gamma Response&#39;, &#39;Apical Junction&#39;, &#39;Apical Surface&#39;, &#39;Hedgehog Signaling&#39;, &#39;Complement&#39;, &#39;Unfolded Protein Response&#39;, &#39;PI3K/AKT/mTOR  Signaling&#39;, &#39;mTORC1 Signaling&#39;, &#39;E2F Targets&#39;, &#39;Myc Targets V1&#39;, &#39;Myc Targets V2&#39;, &#39;Epithelial Mesenchymal Transition&#39;, &#39;Inflammatory Response&#39;, &#39;Xenobiotic Metabolism&#39;, &#39;Fatty Acid Metabolism&#39;, &#39;Oxidative Phosphorylation&#39;, &#39;Glycolysis&#39;, &#39;Reactive Oxygen Species Pathway&#39;, &#39;p53 Pathway&#39;, &#39;UV Response Up&#39;, &#39;UV Response Dn&#39;, &#39;Angiogenesis&#39;, &#39;heme Metabolism&#39;, &#39;Coagulation&#39;, &#39;IL-2/STAT5 Signaling&#39;, &#39;Bile Acid Metabolism&#39;, &#39;Pperoxisome&#39;, &#39;Allograft Rejection&#39;, &#39;KRAS Signaling Up&#39;]</span>
+<span class="c1"># b=[&#39;TNF-alpha Signaling via NF-kB&#39;, &#39;Hypoxia&#39;, &#39;Cholesterol Homeostasis&#39;, &#39;Mitotic Spindle&#39;, &#39;Wnt-beta Catenin Signaling&#39;, &#39;TGF-beta Signaling&#39;, &#39;IL-6/JAK/STAT3 Signaling&#39;, &#39;DNA Repair&#39;, &#39;G2-M Checkpoint&#39;, &#39;Apoptosis&#39;, &#39;Notch Signaling&#39;, &#39;Adipogenesis&#39;, &#39;Estrogen Response Early&#39;, &#39;Estrogen Response Late&#39;, &#39;Androgen Response&#39;, &#39;Myogenesis&#39;, &#39;Protein Secretion&#39;, &#39;Interferon Alpha Response&#39;, &#39;Interferon Gamma Response&#39;, &#39;Apical Junction&#39;, &#39;Apical Surface&#39;, &#39;Hedgehog Signaling&#39;, &#39;Complement&#39;, &#39;Unfolded Protein Response&#39;, &#39;PI3K/AKT/mTOR  Signaling&#39;, &#39;mTORC1 Signaling&#39;, &#39;E2F Targets&#39;, &#39;Myc Targets V1&#39;, &#39;Myc Targets V2&#39;, &#39;Epithelial Mesenchymal Transition&#39;, &#39;Inflammatory Response&#39;, &#39;Xenobiotic Metabolism&#39;, &#39;Fatty Acid Metabolism&#39;, &#39;Oxidative Phosphorylation&#39;, &#39;Glycolysis&#39;, &#39;Reactive Oxygen Species Pathway&#39;, &#39;p53 Pathway&#39;, &#39;UV Response Up&#39;, &#39;UV Response Dn&#39;, &#39;Angiogenesis&#39;, &#39;heme Metabolism&#39;, &#39;Coagulation&#39;, &#39;IL-2/STAT5 Signaling&#39;, &#39;Bile Acid Metabolism&#39;, &#39;Pperoxisome&#39;, &#39;Allograft Rejection&#39;, &#39;KRAS Signaling Up&#39;]</span>
+<span class="n">count</span><span class="o">=</span><span class="mi">0</span>
+<span class="k">for</span> <span class="n">i</span><span class="p">,</span><span class="n">j</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">a</span><span class="p">,</span><span class="n">b</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">i</span><span class="o">==</span><span class="n">j</span><span class="p">:</span>
+        <span class="n">count</span><span class="o">+=</span><span class="mi">1</span>
+<span class="k">if</span> <span class="n">count</span><span class="o">==</span><span class="nb">len</span><span class="p">(</span><span class="n">a</span><span class="p">):</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;All pathways are same in P1 and P2&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+All pathways are same in P1 and P2
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[16]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">train_set_a</span><span class="o">=</span> <span class="p">[</span><span class="s1">&#39;MEND139&#39;</span><span class="p">,</span><span class="s1">&#39;MEND140&#39;</span><span class="p">,</span><span class="s1">&#39;MEND141&#39;</span><span class="p">,</span><span class="s1">&#39;MEND142&#39;</span><span class="p">,</span><span class="s1">&#39;MEND143&#39;</span><span class="p">,</span><span class="s1">&#39;MEND144&#39;</span><span class="p">,</span><span class="s1">&#39;MEND145&#39;</span><span class="p">,</span><span class="s1">&#39;MEND146&#39;</span><span class="p">,</span><span class="s1">&#39;MEND147&#39;</span><span class="p">,</span><span class="s1">&#39;MEND148&#39;</span><span class="p">,</span><span class="s1">&#39;MEND149&#39;</span><span class="p">,</span><span class="s1">&#39;MEND150&#39;</span><span class="p">,</span><span class="s1">&#39;MEND151&#39;</span><span class="p">,</span><span class="s1">&#39;MEND152&#39;</span><span class="p">,</span><span class="s1">&#39;MEND153&#39;</span><span class="p">]</span>
+<span class="n">train_set_b</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;MEND154&quot;</span><span class="p">,</span><span class="s2">&quot;MEND156&quot;</span><span class="p">,</span><span class="s2">&quot;MEND157&quot;</span><span class="p">,</span><span class="s2">&quot;MEND158&quot;</span><span class="p">,</span><span class="s2">&quot;MEND159&quot;</span><span class="p">,</span><span class="s2">&quot;MEND160&quot;</span><span class="p">,</span><span class="s2">&quot;MEND161&quot;</span><span class="p">,</span><span class="s2">&quot;MEND162&quot;</span><span class="p">]</span>
+<span class="n">a</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">train_set_a</span><span class="o">+</span><span class="n">train_set_b</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+[&#39;MEND139&#39; &#39;MEND140&#39; &#39;MEND141&#39; &#39;MEND142&#39; &#39;MEND143&#39; &#39;MEND144&#39; &#39;MEND145&#39;
+ &#39;MEND146&#39; &#39;MEND147&#39; &#39;MEND148&#39; &#39;MEND149&#39; &#39;MEND150&#39; &#39;MEND151&#39; &#39;MEND152&#39;
+ &#39;MEND153&#39; &#39;MEND154&#39; &#39;MEND156&#39; &#39;MEND157&#39; &#39;MEND158&#39; &#39;MEND159&#39; &#39;MEND160&#39;
+ &#39;MEND161&#39; &#39;MEND162&#39;]
+</pre></div></div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[17]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">random</span>
+<span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">42</span><span class="p">)</span>
+<span class="n">group1_indices</span> <span class="o">=</span> <span class="p">[</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">a</span><span class="p">)</span> <span class="k">if</span> <span class="s1">&#39;MEND139&#39;</span> <span class="o">&lt;=</span> <span class="n">x</span> <span class="o">&lt;=</span> <span class="s1">&#39;MEND153&#39;</span><span class="p">]</span>
+<span class="n">group2_indices</span> <span class="o">=</span> <span class="p">[</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">a</span><span class="p">)</span> <span class="k">if</span> <span class="n">x</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">a</span><span class="p">[</span><span class="nb">min</span><span class="p">(</span><span class="n">group1_indices</span><span class="p">):</span><span class="nb">max</span><span class="p">(</span><span class="n">group1_indices</span><span class="p">)</span><span class="o">+</span><span class="mi">1</span><span class="p">]]</span>
+
+<span class="c1"># Randomly select 5 from each (with replacement=False to avoid duplicates)</span>
+<span class="n">group1_random</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="n">group1_indices</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span>
+<span class="n">group2_random</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="n">group2_indices</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[18]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">a</span><span class="p">[</span><span class="n">group1_random</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[18]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+array([&#39;MEND149&#39;, &#39;MEND140&#39;, &#39;MEND139&#39;, &#39;MEND150&#39;, &#39;MEND143&#39;], dtype=&#39;&lt;U7&#39;)
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[19]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">a</span><span class="p">[</span><span class="n">group2_random</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[19]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+array([&#39;MEND158&#39;, &#39;MEND156&#39;, &#39;MEND161&#39;, &#39;MEND154&#39;, &#39;MEND159&#39;], dtype=&#39;&lt;U7&#39;)
+</pre></div></div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[20]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">samples_train</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">((</span><span class="n">a</span><span class="p">[</span><span class="n">group1_random</span><span class="p">],</span><span class="n">a</span><span class="p">[</span><span class="n">group2_random</span><span class="p">]))</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[21]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">samples_train</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[21]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+array([&#39;MEND149&#39;, &#39;MEND140&#39;, &#39;MEND139&#39;, &#39;MEND150&#39;, &#39;MEND143&#39;, &#39;MEND158&#39;,
+       &#39;MEND156&#39;, &#39;MEND161&#39;, &#39;MEND154&#39;, &#39;MEND159&#39;], dtype=&#39;&lt;U7&#39;)
+</pre></div></div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>
+</pre></div>
+</div>
+</div>
+</section>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2026, Muhammad Ahtazaz Ahsan.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

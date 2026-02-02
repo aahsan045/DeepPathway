@@ -1,4 +1,4 @@
-API_Reference
+API Reference
 =============
 
 Welcome to the DeepPathway Tutorials section.  

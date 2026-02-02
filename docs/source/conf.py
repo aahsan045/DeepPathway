@@ -25,7 +25,6 @@ extensions = [
     "sphinx.ext.napoleon",
     "sphinx.ext.viewcode",
     "sphinx.ext.mathjax",
-    "nbsphinx"
     ]
 nbsphinx_execute = "never"
 

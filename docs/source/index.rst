@@ -7,6 +7,16 @@ DeepPathway is a deep learning framework for predicting pathway expression from 
    :maxdepth: 2
    :caption: Contents:
 
-   installation
-   usage
+   Usage
    Tutorials
+   .. toctree::
+   :maxdepth: 2
+
+   tutorials/data processing
+   tutorials/training
+   
+
+
+   API Reference
+   README
+

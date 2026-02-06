@@ -21,12 +21,12 @@ release = '0.1'
 # ---- General configuration ----
 
 extensions = [
+    "nbsphinx",
     "sphinx.ext.autodoc",
     "sphinx.ext.napoleon",
     "sphinx.ext.viewcode",
     "sphinx.ext.mathjax",
-    ]
-nbsphinx_execute = "never"
+]
 
 templates_path = ["_templates"]
 exclude_patterns = []
@@ -35,7 +35,10 @@ exclude_patterns = []
 source_suffix = {
     ".rst": "restructuredtext",
     ".md": "markdown",
+    ".ipynb": "jupyter_notebook"
 }
+
+nbsphinx_execute = "never"
 
 # ---- HTML output ----
 

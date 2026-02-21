@@ -9,4 +9,4 @@ Here you will find step-by-step guides and example notebooks.
    :glob:
 
    data_processing
-   trainingcd 
+   training

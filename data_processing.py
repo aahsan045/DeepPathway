@@ -53,7 +53,8 @@ def save_adatas(paths,unique_common_genes):
         filtered_exp_mtxs.append(adata[:,indices].X)
         barcodes_updated.append(adata.obs_names)
         print(adata[:, indices].X.shape)
-    return filtered_exp_mtxs,barcodes_updated
+        genes = list(adata.var_names.values)
+    return genes,filtered_exp_mtxs,barcodes_updated # type: ignore
 
 def check(image,threshold=0.75):
     white=200
@@ -285,7 +286,7 @@ def main():
     for each in samples:
         paths.append(root_path+"st/"+each+".h5ad")
     uni_common_genes= get_adata(paths,uni_pathway_genes)
-    filtered_exp_mtxs, barcodes = save_adatas(paths,uni_common_genes)
+    unique_common_genes, filtered_exp_mtxs, barcodes = save_adatas(paths,uni_common_genes)
     print("Saving the Filtered Barcodes after spot filtering")
     save_filtered_barcodes_gene(root_path, paths, barcodes, samples)
     print("Starting Image Processing......")
@@ -294,9 +295,9 @@ def main():
     save_filtered_barcodes_image(root_path, img_fil_barcodes, img_fil_paths, samples)
     print("Saving the pathway-associated unique common genes")
     save_gene_exp_data(root_path, filtered_exp_mtxs, samples)
-    print("Saving Unique Common Genes:, ", len(uni_common_genes))
-    np.save(root_path + cfg.dataset+'_unique_common_genes.npy', uni_common_genes)
-    filtered_pathway_dic = filtering_pathway(pathway_dict, uni_common_genes, threshold_pathways=cfg.threshold_pathways) #more than or equal to 70% pathway genes should be in data to calculate pathway expr. .
+    print("Saving Unique Common Genes:, ", len(unique_common_genes))
+    np.save(root_path + cfg.dataset+'_unique_common_genes.npy', unique_common_genes)
+    filtered_pathway_dic = filtering_pathway(pathway_dict, unique_common_genes, threshold_pathways=cfg.threshold_pathways) #more than or equal to 70% pathway genes should be in data to calculate pathway expr. .
     print(f"Saving the filtered pathway dict having number of pathways:{len(filtered_pathway_dic.keys())} in JSON")
     file_path = root_path + 'pathway_dic_' + str(len(filtered_pathway_dic)) + '.json'
     with open(file_path, 'w') as json_file:

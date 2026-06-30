@@ -58,7 +58,7 @@ dataset="prostate"
 all_samples=['MEND154',"MEND156","MEND157","MEND158","MEND159","MEND160","MEND161","MEND162"]
 test_sample="MEND154"   # One test sample Id for test
 train_samples=sorted(list(set(all_samples)-set([test_sample])))
-root_path="/home/e90244aa/Bleep/DeepPathwayV2/prostate cancer dataset/"
+root_path="/home/e90244aa/Bleep/DeepPathwayV3/prostate cancer dataset/"
 hest_metadata=pd.read_csv("/home/e90244aa/Bleep/DeepPathway/HEST_v1_1_0 .csv") #download metadata CSV file from https://huggingface.co/datasets/MahmoodLab/hest/tree/main
 mpp_res = [hest_metadata[hest_metadata['id']==each]['pixel_size_um_estimated'].values.astype(float)[0] for each in all_samples]
 # mpp_res=[0.3415]*len(all_samples)

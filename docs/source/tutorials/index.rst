@@ -8,5 +8,5 @@ Here you will find step-by-step guides and example notebooks.
    :maxdepth: 2
    :glob:
 
-   data_processing
-   training
+   training_stage-1 (Bleep with Optimus)
+   training_stage-2 (DeepPathway)
